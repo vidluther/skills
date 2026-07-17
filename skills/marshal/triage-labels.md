@@ -30,7 +30,7 @@ Issues opened directly by humans (GitHub UI, API, etc.) carry no provenance labe
 
 ## Other labels in this repo
 
-These labels exist in the tracker but aren't part of the canonical state/provenance/category model. The `triage` skill preserves them and surfaces them in agent briefs so implementing agents see the full context — an issue tagged `ready-for-agent + security` should be handled very differently from a routine `ready-for-agent + bug`.
+These labels exist in the tracker but aren't part of the canonical state/provenance/category model. Skills preserve them and surface them in agent briefs so implementing agents see the full context — an issue tagged `ready-for-agent + security` should be handled very differently from a routine `ready-for-agent + bug`.
 
 | Label   | Description (from tracker, if available)        |
 | ------- | ----------------------------------------------- |

@@ -34,7 +34,7 @@ last_reviewed: <YYYY-MM-DD>
 
 Supporting files live alongside `SKILL.md` in the same directory (e.g. `marshal/triage-labels.md`, `tdd/refactoring.md`). The skill body references them by relative path; agents only read them when the skill instructs them to.
 
-Skills cross-reference each other by name (e.g. `marshal` mentions `to-issues`, `triage`, `tdd`, `diagnose`). Renaming a skill silently breaks those references — grep before renaming.
+Skills cross-reference each other by name (e.g. `marshal` mentions `to-issues`, `tdd`, `diagnose`). Renaming a skill silently breaks those references — grep before renaming.
 
 ## Distribution model (what setup.sh does)
 
@@ -54,7 +54,7 @@ Three destinations, two patterns:
 
 ## Third-party (vendored) skills
 
-Some skills are forks of public skill sets (e.g. `shadcn-ui`) vendored into `skills/` and then adapted. They are **ours now** — we never auto-update them.
+Skills may be forks of public skill sets vendored into `skills/` and then adapted (none currently). When vendored, they are **ours now** — we never auto-update them.
 
 **Why no auto-update:** a skill is instructions an agent *executes* while holding real tools (shell, file edits, MCP), so a vendored skill is third-party *code you run*. Auto-pulling upstream would be an unattended supply-chain channel — upstream changes the prompt, the next agent run obeys it. So upstream is a place we shop on need, not a feed we sync from. (Full rationale in the README "Security" section. Do not "helpfully" automate this away.)
 

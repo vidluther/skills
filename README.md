@@ -6,15 +6,15 @@ The name is from Chacha Chaudhary, the Indian comic series. Chacha is the brain 
 
 ## What's in here
 
-- **`skills/`** — a collection of skills (capability-shaped prompts) the agent can pick up and run. Each one is a SKILL.md plus optional supporting files. The skills live by themselves so they can be invoked individually (`/marshal`, `/triage`, etc.) and read each other for cross-reference.
+- **`skills/`** — a collection of skills (capability-shaped prompts) the agent can pick up and run. Each one is a SKILL.md plus optional supporting files. The skills live by themselves so they can be invoked individually (`/marshal`, `/tdd`, etc.) and read each other for cross-reference.
 
 The skills currently cover, roughly:
 
 - **Project setup** — `marshal` (lays the rails: CLAUDE.md/AGENTS.md coherence, issue tracker, triage labels, domain doc layout, code style, version control conventions).
-- **Issue workflow** — `triage` (state machine for incoming issues), `to-issues` (break a plan into tickets), `to-prd` (turn a conversation into a PRD).
+- **Issue workflow** — `to-issues` (break a plan into tickets), `to-prd` (turn a conversation into a PRD).
 - **Implementation discipline** — `tdd` (red-green-refactor), `diagnose` (disciplined debugging loop), `improve-codebase-architecture` (find deepening opportunities).
 - **Design / collaboration** — `rubber-duck` (interview the user about a plan, challenging it against the project's domain language and capturing decisions when the project documents them), `zoom-out` (step back from current work).
-- **Stack-specific helpers** — `shadcn-ui`, `migrate-oxlint`.
+- **Stack-specific helpers** — `migrate-oxlint`.
 
 ## Getting started
 
@@ -28,7 +28,7 @@ cd ~/work/personal/sabu
 
 ## Provenance
 
-Most of the skills are forks or evolutions of public sets — Matt Pocock's skill collection and others — adapted to my workflow. Some are bespoke. The `marshal` skill (and the broader state/provenance label model in `triage`) were rewritten from scratch in May 2026 as part of a redesign aimed at making the harness work for any new or existing repo.
+Most of the skills are forks or evolutions of public sets — Matt Pocock's skill collection and others — adapted to my workflow. Some are bespoke. The `marshal` skill (and its state/provenance label model) was rewritten from scratch in May 2026 as part of a redesign aimed at making the harness work for any new or existing repo.
 
 Vendored third-party skills record where they came from in their `SKILL.md` frontmatter: `source:` (upstream repo), `source_path:`, `upstream_ref:` (the commit last reconciled against), and `last_reviewed:`. The presence of `source:` is what marks a skill as third-party — `rg '^source:' skills/*/SKILL.md` lists them. These are forks, not mirrors: I adapt them, so upstream is somewhere I shop for improvements on need, not a feed I sync from. To review what changed upstream before pulling anything in, run `./update-thirdparty-skills.sh <name>` — it's read-only (shows the upstream diff and a Skillspector scan; never edits `skills/`).
 
