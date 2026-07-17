@@ -54,7 +54,7 @@ Three destinations, two patterns:
 
 ## Third-party (vendored) skills
 
-Some skills are forks of public skill sets (e.g. `gitbutler`, `shadcn-ui`) vendored into `skills/` and then adapted. They are **ours now** — we never auto-update them.
+Some skills are forks of public skill sets (e.g. `shadcn-ui`) vendored into `skills/` and then adapted. They are **ours now** — we never auto-update them.
 
 **Why no auto-update:** a skill is instructions an agent *executes* while holding real tools (shell, file edits, MCP), so a vendored skill is third-party *code you run*. Auto-pulling upstream would be an unattended supply-chain channel — upstream changes the prompt, the next agent run obeys it. So upstream is a place we shop on need, not a feed we sync from. (Full rationale in the README "Security" section. Do not "helpfully" automate this away.)
 

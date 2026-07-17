@@ -14,7 +14,7 @@ The skills currently cover, roughly:
 - **Issue workflow** — `triage` (state machine for incoming issues), `to-issues` (break a plan into tickets), `to-prd` (turn a conversation into a PRD).
 - **Implementation discipline** — `tdd` (red-green-refactor), `diagnose` (disciplined debugging loop), `improve-codebase-architecture` (find deepening opportunities).
 - **Design / collaboration** — `rubber-duck` (interview the user about a plan, challenging it against the project's domain language and capturing decisions when the project documents them), `zoom-out` (step back from current work).
-- **Stack-specific helpers** — `gitbutler`, `shadcn-ui`, `migrate-oxlint`.
+- **Stack-specific helpers** — `shadcn-ui`, `migrate-oxlint`.
 
 ## Getting started
 

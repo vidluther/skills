@@ -11,7 +11,7 @@
 #
 # Usage:
 #   ./update-thirdparty-skills.sh              # check every skill that has a `source:` field
-#   ./update-thirdparty-skills.sh gitbutler    # check just the named skill(s)
+#   ./update-thirdparty-skills.sh shadcn-ui    # check just the named skill(s)
 #
 # A skill is "vendored" iff its SKILL.md frontmatter has a top-level `source:`.
 # Recognised provenance fields (all flat, top-level, so `rg '^source:'` audits):
