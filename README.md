@@ -30,7 +30,7 @@ cd ~/work/personal/sabu
 
 Most of the skills are forks or evolutions of public sets — Matt Pocock's skill collection and others — adapted to my workflow. Some are bespoke. The `marshal` skill (and its state/provenance label model) was rewritten from scratch in May 2026 as part of a redesign aimed at making the harness work for any new or existing repo.
 
-Vendored third-party skills record where they came from in their `SKILL.md` frontmatter: `source:` (upstream repo), `source_path:`, `upstream_ref:` (the commit last reconciled against), and `last_reviewed:`. The presence of `source:` is what marks a skill as third-party — `rg '^source:' skills/*/SKILL.md` lists them. These are forks, not mirrors: I adapt them, so upstream is somewhere I shop for improvements on need, not a feed I sync from. To review what changed upstream before pulling anything in, run `./update-thirdparty-skills.sh <name>` — it's read-only (shows the upstream diff and a Skillspector scan; never edits `skills/`).
+Vendored third-party skills record where they came from in their `SKILL.md` frontmatter: `source:` (upstream repo), `source_path:`, `upstream_ref:` (the commit last reconciled against), and `last_reviewed:`. The presence of `source:` is what marks a skill as third-party — `rg '^source:' skills/*/SKILL.md` lists them (currently six, all tracing back to mattpocock/skills). These are forks, not mirrors: I adapt them, so upstream is somewhere I shop for improvements on need, not a feed I sync from. To review what changed upstream before pulling anything in, run `./update-thirdparty-skills.sh <name>` — it's read-only (shows the upstream diff and a Skillspector scan; never edits `skills/`).
 
 ## Security 
 

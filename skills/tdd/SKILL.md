@@ -1,6 +1,10 @@
 ---
 name: tdd
 description: Test-driven development with red-green-refactor loop. Use when user wants to build features or fix bugs using TDD, mentions "red-green-refactor", wants integration tests, or asks for test-first development.
+source: https://github.com/mattpocock/skills
+source_path: skills/engineering/tdd
+upstream_ref: 9603c1cc8118d08bc1b3bf34cf714f62178dea3b
+last_reviewed: 2026-07-17
 ---
 
 # Test-Driven Development
@@ -104,6 +108,7 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 [ ] Test describes behavior, not implementation
 [ ] Test uses public interface only
 [ ] Test would survive internal refactor
+[ ] Expected values come from an independent source of truth, not recomputed the way the code computes them
 [ ] Code is minimal for this test
 [ ] No speculative features added
 ```

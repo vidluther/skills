@@ -1,6 +1,10 @@
 ---
 name: improve-codebase-architecture
 description: Find deepening opportunities in a codebase, informed by the domain language in CONTEXT.md and the decisions in docs/adr/. Use when the user wants to improve architecture, find refactoring opportunities, consolidate tightly-coupled modules, or make a codebase more testable and AI-navigable.
+source: https://github.com/mattpocock/skills
+source_path: skills/engineering/improve-codebase-architecture
+upstream_ref: 9603c1cc8118d08bc1b3bf34cf714f62178dea3b
+last_reviewed: 2026-07-17
 ---
 
 # Improve Codebase Architecture
@@ -32,6 +36,11 @@ This skill is _informed_ by the project's domain model. The domain language give
 
 ### 1. Explore
 
+**Scope before you scan — YAGNI.** Deepening a module pays off by making future changes to it easier, so put extra weight on the parts of the codebase that have recently changed. Decide *where* to look before you look:
+
+- If the user named a direction — a module, a subsystem, a pain point — take it, and skip the inference below.
+- Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots — the files and areas that keep coming up — and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
+
 Read the project's domain glossary and any ADRs in the area you're touching first.
 
 Then use the Agent tool with `subagent_type=Explore` to walk the codebase. Don't follow rigid heuristics — explore organically and note where you experience friction:
@@ -61,7 +70,7 @@ Do NOT propose interfaces yet. Ask the user: "Which of these would you like to e
 
 ### 3. Rubberducking loop
 
-Once the user picks a candidate, drop into a rubberducking conversation. Walk the design tree with them — constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
+Once the user picks a candidate, drop into a rubberducking conversation. Walk the decision tree with them — constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
 
 Side effects happen inline as decisions crystallize:
 

@@ -1,15 +1,23 @@
 ---
 name: rubber-duck
 description: Interview the user relentlessly about a plan or design, one question at a time, until reaching shared understanding — resolving each branch of the decision tree. When the project documents its domain (CONTEXT.md, ADRs), challenge the plan against that language and capture decisions inline. Use when the user wants to stress-test a plan or an issue, asks your opinion on a plan or design, or mentions "rubber-duck" / "rubberducking".
+source: https://github.com/mattpocock/skills
+source_path: skills/productivity/grilling
+upstream_ref: 9603c1cc8118d08bc1b3bf34cf714f62178dea3b
+last_reviewed: 2026-07-17
 ---
 
 <what-to-do>
 
-Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one.
+Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one.
 
 Ask one question at a time, and wait for my answer before moving to the next one. This is the whole point: ten questions fired at once is a form, not an interview. For each question, give your recommended answer and the reasoning behind it — but treat it as a proposal, not a verdict. Wait for me to confirm or redirect before walking down that branch. The recommendation exists to move us forward, not to answer the question for me.
 
-If a question can be answered by exploring the codebase, explore the codebase instead of asking.
+If a *fact* can be found by exploring the codebase, look it up rather than asking me. The *decisions*, though, are mine — put each one to me and wait for my answer.
+
+Do not act on the plan until I confirm we have reached a shared understanding.
+
+Once I confirm, offer to save the final plan as `docs/plans/<model>-<topic>.md` — `<model>` is a short slug for the model you are running on (fable, opus, kimi, gpt5, …), `<topic>` a kebab-case slug for the work (ask me if it isn't obvious). I may run this same interview on other models; `/reconcile-plans` merges the saved plans into a final one.
 
 </what-to-do>
 
