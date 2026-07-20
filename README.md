@@ -13,7 +13,7 @@ The skills currently cover, roughly:
 - **Project setup** — `marshal` (lays the rails: CLAUDE.md/AGENTS.md coherence, issue tracker, triage labels, domain doc layout, code style, version control conventions).
 - **Issue workflow** — `to-issues` (break a plan into tickets), `to-prd` (turn a conversation into a PRD).
 - **Implementation discipline** — `tdd` (red-green-refactor), `diagnose` (disciplined debugging loop), `improve-codebase-architecture` (find deepening opportunities).
-- **Design / collaboration** — `rubber-duck` (interview the user about a plan, challenging it against the project's domain language and capturing decisions when the project documents them), `zoom-out` (step back from current work).
+- **Design / collaboration** — `rubber-duck` (interview the user about a plan, challenging it against the project's domain language and capturing decisions when the project documents them), `reconcile-plans` (the follow-up to `rubber-duck`: reconcile multiple plans for the same work — produced by different models or sessions — into one, surfacing where they agree, where they diverge, and the catches only one model noticed, optionally convening a lens-based review council), `zoom-out` (step back from current work).
 - **Stack-specific helpers** — `migrate-oxlint`.
 
 ## Getting started

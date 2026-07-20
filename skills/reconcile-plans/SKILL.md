@@ -28,7 +28,7 @@ Decision points one plan addresses and another silently skips are data, not nois
 
 Sort every decision point into one of four buckets:
 
-- **Settled** — all plans agree. Adopt with confidence; independent agreement across models is the strongest signal this process produces.
+- **Settled** — all plans agree. Adopt with confidence; agreement across models is the strongest signal this process produces. But settled means "cheap to stop debating", not "proven" — the models may share training-data biases, which is exactly what the blind-spots pass below exists to catch.
 - **Majority** — most agree, one dissents. Do not dismiss the outlier by count: read its reasoning. An outlier with a load-bearing argument gets promoted to Divergent; an outlier with none gets noted and closed.
 - **Divergent** — genuine disagreement. These are the real decisions. For each, lay out the positions, the trade-off actually at stake, and your recommendation with reasoning.
 - **Unique contributions** — a risk, edge case, or idea only one plan raised. A plan can lose every divergence and still contribute the catch that saves the project. Harvest these regardless of which plan "wins".
