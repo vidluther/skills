@@ -1,19 +1,31 @@
 ---
 name: rubber-duck
-description: Interview the user relentlessly about a plan or design, one question at a time, until reaching shared understanding — resolving each branch of the decision tree. When the project documents its domain (CONTEXT.md, ADRs), challenge the plan against that language and capture decisions inline. Use when the user wants to stress-test a plan or an issue, asks your opinion on a plan or design, or mentions "rubber-duck" / "rubberducking".
+description: Interview the user relentlessly about a plan or design, in rounds of independent questions, until reaching shared understanding — resolving each branch of the decision tree. When the project documents its domain (CONTEXT.md, ADRs), challenge the plan against that language and capture decisions inline. Use when the user wants to stress-test a plan or an issue, asks your opinion on a plan or design, or mentions "rubber-duck" / "rubberducking".
 source: https://github.com/mattpocock/skills
 source_path: skills/productivity/grilling
-upstream_ref: 9603c1cc8118d08bc1b3bf34cf714f62178dea3b
-last_reviewed: 2026-07-17
+upstream_ref: 8b36d4fb2635b3c21998dcd8144439c9e5ba7302
+last_reviewed: 2026-08-06
 ---
 
 <what-to-do>
 
-Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one.
+Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Treat the plan as a decision tree: every decision branches into the decisions that hang off it.
 
-Ask one question at a time, and wait for my answer before moving to the next one. This is the whole point: ten questions fired at once is a form, not an interview. For each question, give your recommended answer and the reasoning behind it — but treat it as a proposal, not a verdict. Wait for me to confirm or redirect before walking down that branch. The recommendation exists to move us forward, not to answer the question for me.
+Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled — the questions you can ask *now* without guessing at answers you haven't heard yet. Ask the whole frontier as one numbered round, then wait for my answers before the next. A question whose answer depends on another question still open in this round belongs to a later round, not this one — batching *dependent* questions is a form, not an interview; the frontier is what makes a round legitimate.
 
-If a *fact* can be found by exploring the codebase, look it up rather than asking me. The *decisions*, though, are mine — put each one to me and wait for my answer.
+Format each question like this:
+
+```
+❓ **Q<n> — <title>**: <question body>
+
+➡️ <your recommended answer and the reasoning behind it>
+```
+
+The numbering is load-bearing — it lets me answer "1 yes, 3 no, 4 let's talk." The recommendation is a proposal, not a verdict: wait for me to confirm or redirect before walking down that branch. It exists to move us forward, not to answer the question for me.
+
+Each round of answers reshapes the tree — settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. We're done when the frontier is empty: every branch visited, nothing left silently assumed.
+
+Finding *facts* is your job, never mine. If something can be found by exploring the codebase, look it up rather than asking me. A slow lookup blocks only the questions downstream of it — ask the rest of the frontier now. Sub-agents are an option for genuinely broad searches, not a standing order — and never leave one running unattended past the round that needed it. The *decisions*, though, are mine — put each one to me and wait for my answer.
 
 Do not act on the plan until I confirm we have reached a shared understanding.
 
@@ -81,7 +93,7 @@ When the user states how something works, check whether the code agrees. If you 
 
 ### Update CONTEXT.md inline
 
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+When a round's answers resolve a term, update `CONTEXT.md` before asking the next round — capture per round, don't save it all for the end. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
 
 Don't couple `CONTEXT.md` to implementation details. Only include terms that are meaningful to domain experts.
 

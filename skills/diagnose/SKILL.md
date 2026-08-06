@@ -3,8 +3,8 @@ name: diagnose
 description: Disciplined diagnosis loop for hard bugs and performance regressions. Reproduce → minimise → hypothesise → instrument → fix → regression-test. Use when user says "diagnose this" / "debug this", reports a bug, says something is broken/throwing/failing, or describes a performance regression.
 source: https://github.com/mattpocock/skills
 source_path: skills/engineering/diagnosing-bugs
-upstream_ref: 9603c1cc8118d08bc1b3bf34cf714f62178dea3b
-last_reviewed: 2026-07-17
+upstream_ref: 8b36d4fb2635b3c21998dcd8144439c9e5ba7302
+last_reviewed: 2026-08-06
 ---
 
 # Diagnose

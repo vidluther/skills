@@ -58,6 +58,6 @@ Write the report to `docs/plans/council-<topic>.md` using the template in [REPOR
 
 Offer to draft the reconciled plan — `docs/plans/final-<topic>.md`: settled decisions adopted as-is, unique contributions folded in, and each divergence resolved.
 
-Resolve divergences with the user, not for them: walk the open decisions one at a time, rubber-duck style — recommendation offered, user confirms or redirects. For a long list, offer to hand the open decisions to `/rubber-duck` as the interview agenda.
+Resolve divergences with the user, not for them: walk the open decisions round-by-round, rubber-duck style — the divergences are an already-enumerated frontier, so ask the independent ones as one numbered round, recommendation offered on each, user confirms or redirects; decisions that depend on another still-open decision wait for a later round. For a long list, offer to hand the open decisions to `/rubber-duck` as the interview agenda.
 
 When the final plan is approved, offer the natural next step: `/to-issues` to break it into tickets, or `/to-prd` to publish it.
