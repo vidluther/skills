@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Sabu setup — wire skills (and, in future, hooks/configs) into the locations
+# Skills setup — wire skills (and, in future, hooks/configs) into the locations
 # agent tooling reads.
 #
 # Destinations:
 # - $AGENT_SKILLS_DIR ($HOME/.agents/skills) — universal location for the AGENTS.md
-#   convention; tools that follow it (or future hooks/configs Sabu adds) read from here.
+#   convention; tools that follow it (or future hooks/configs this repo adds) read from here.
 # - $CLAUDE_SKILLS_DIR ($HOME/.claude/skills/<name>) — Claude Code-specific. Each skill
 #   needs its own entry in this directory because that's where Claude Code discovers them.
 # - $GEMINI_SKILLS_DIR ($HOME/.gemini/antigravity/skills/<name>) — Gemini Antigravity.
@@ -17,8 +17,8 @@
 
 set -euo pipefail
 
-SABU_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS_DIR="$SABU_DIR/skills"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILLS_DIR="$REPO_DIR/skills"
 
 AGENTS_DIR="$HOME/.agents"
 AGENT_SKILLS_DIR="$AGENTS_DIR/skills"
@@ -42,9 +42,9 @@ mkdir -p "$AGENTS_DIR"
 mkdir -p "$CLAUDE_SKILLS_DIR"
 mkdir -p "$GEMINI_SKILLS_DIR"
 
-# 1) Universal location: $AGENT_SKILLS_DIR is one symlink to sabu/skills/.
+# 1) Universal location: $AGENT_SKILLS_DIR is one symlink to this repo's skills/.
 # Single parent symlink (rather than per-skill) keeps the AGENTS.md path
-# uniform — anything added under sabu/skills/ shows up automatically.
+# uniform — anything added under skills/ shows up automatically.
 if [ -L "$AGENT_SKILLS_DIR" ]; then
   current="$(readlink "$AGENT_SKILLS_DIR")"
   if [ "$current" != "$SKILLS_DIR" ]; then
@@ -122,4 +122,4 @@ report_dangling "$CLAUDE_SKILLS_DIR"
 report_dangling "$GEMINI_SKILLS_DIR"
 
 echo
-echo "Sabu setup complete."
+echo "Skills setup complete."
