@@ -19,8 +19,8 @@ The skills currently cover, roughly:
 ## Getting started
 
 ```sh
-git clone git@github.com:vidluther/sabu.git ~/work/personal/sabu
-cd ~/work/personal/sabu
+git clone git@github.com:vidluther/skills.git ~/work/personal/skills
+cd ~/work/personal/skills
 ./setup.sh
 ```
 
