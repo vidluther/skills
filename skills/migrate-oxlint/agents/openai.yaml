@@ -1,0 +1,4 @@
+interface:
+  display_name: "Migrate to Oxlint"
+  short_description: "Migrate JavaScript projects from ESLint"
+  default_prompt: "Use $migrate-oxlint to migrate this project from ESLint to Oxlint."

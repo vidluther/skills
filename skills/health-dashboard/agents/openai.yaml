@@ -1,0 +1,4 @@
+interface:
+  display_name: "Health Dashboard"
+  short_description: "Update and analyze Vid's health dashboard"
+  default_prompt: "Use $health-dashboard to update my health dashboard."

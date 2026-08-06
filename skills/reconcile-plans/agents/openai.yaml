@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reconcile Plans"
+  short_description: "Merge competing plans into one decision record"
+  default_prompt: "Use $reconcile-plans to compare these plans and produce a final recommendation."

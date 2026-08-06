@@ -1,6 +1,6 @@
 ---
 name: marshal
-description: Sets up project rails for human + AI collaboration. Walks through five sections — CLAUDE.md/AGENTS.md coherence, issue tracker + triage labels, domain doc layout, code-style conventions, and version-control conventions — recording the result so the engineering skills (`to-issues`, `to-prd`, `diagnose`, `tdd`, `improve-codebase-architecture`, `zoom-out`) and any humans working alongside agents share the same baseline. Run on any new or existing repo before starting agent-driven work, or when those skills appear to be missing context.
+description: Sets up project rails for human + AI collaboration. Walks through five sections — CLAUDE.md/AGENTS.md coherence, issue tracker + triage labels, domain doc layout, code-style conventions, and version-control conventions — recording the result so the engineering skills (`to-issues`, `diagnose`, `improve-codebase-architecture`, `zoom-out`) and any humans working alongside agents share the same baseline. Run on any new or existing repo before starting agent-driven work, or when those skills appear to be missing context.
 disable-model-invocation: true
 ---
 
@@ -61,7 +61,7 @@ The `## Agent skills` block goes in the canonical file.
 
 ### Section 2 — Where work happens
 
-> **Explainer:** The "issue tracker" is where issues live for this repo. Skills like `to-issues` and `to-prd` read from and write to it — they need to know whether to call `gh issue create` or follow some other workflow you describe. Pick the place you actually track work for this repo.
+> **Explainer:** The "issue tracker" is where issues live for this repo. Skills like `to-issues` read from and write to it — they need to know whether to call `gh issue create` or follow some other workflow you describe. Pick the place you actually track work for this repo.
 
 Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. Otherwise (or if the user prefers), offer:
 
@@ -70,7 +70,7 @@ Default posture: these skills were designed for GitHub. If a `git remote` points
 
 #### Triage label vocabulary
 
-> **Explainer:** When an incoming issue is triaged, it gets tagged with **state** labels (`needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) so anyone — human or agent — can tell at a glance what's actionable. Issues created via `to-issues`/`to-prd` also get a **provenance** label (`new`) so agent-created issues are distinguishable from human-opened ones. To do this, the actual label strings in your tracker need to match what the skills expect. If your repo already uses different vocabulary (e.g. `untriaged` instead of `new`), record the mapping here so the skill applies the right ones instead of creating duplicates.
+> **Explainer:** When an incoming issue is triaged, it gets tagged with **state** labels (`needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) so anyone — human or agent — can tell at a glance what's actionable. Issues created via `to-issues` also get a **provenance** label (`new`) so agent-created issues are distinguishable from human-opened ones. To do this, the actual label strings in your tracker need to match what the skills expect. If your repo already uses different vocabulary (e.g. `untriaged` instead of `new`), record the mapping here so the skill applies the right ones instead of creating duplicates.
 
 Canonical vocabulary:
 
@@ -83,7 +83,7 @@ Canonical vocabulary:
 An issue with **no state label** is in the inbox — it hasn't been triaged yet.
 
 **Provenance label** (optional):
-- `new` — created via `to-issues`/`to-prd` (agent-flow). Issues opened directly by humans carry no provenance label.
+- `new` — created via `to-issues` (agent-flow). Issues opened directly by humans carry no provenance label.
 
 **Category labels** (mutually exclusive):
 - `bug` — something is broken
@@ -103,7 +103,7 @@ For non-GitHub trackers, ask the user to describe the equivalent vocabulary as f
 
 ### Section 3 — What things mean
 
-> **Explainer:** Some skills (`improve-codebase-architecture`, `diagnose`, `tdd`) read a `CONTEXT.md` file to learn the project's domain language, and `docs/adr/` for past architectural decisions. They need to know whether the repo has one global context or multiple (e.g. a monorepo with separate frontend/backend contexts) so they look in the right place. Marshal also pre-creates the `.out-of-scope/` directory used to record rejected feature requests with reasoning.
+> **Explainer:** Some skills (`improve-codebase-architecture`, `diagnose`) read a `CONTEXT.md` file to learn the project's domain language, and `docs/adr/` for past architectural decisions. They need to know whether the repo has one global context or multiple (e.g. a monorepo with separate frontend/backend contexts) so they look in the right place. Marshal also pre-creates the `.out-of-scope/` directory used to record rejected feature requests with reasoning.
 
 Confirm the layout:
 

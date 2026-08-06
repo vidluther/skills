@@ -1,0 +1,4 @@
+interface:
+  display_name: "Log Workout"
+  short_description: "Record Vid's completed workout session"
+  default_prompt: "Use $log-workout to record today's workout."

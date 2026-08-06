@@ -17,7 +17,7 @@ An issue with **no state label** is in the inbox — it hasn't been triaged yet.
 
 | Canonical label | Label in our tracker | Meaning                                              |
 | --------------- | -------------------- | ---------------------------------------------------- |
-| `new`           | `new`                | Created via `to-issues` or `to-prd` (agent-flow)     |
+| `new`           | `new`                | Created via `to-issues` (agent-flow)                 |
 
 Issues opened directly by humans (GitHub UI, API, etc.) carry no provenance label. That's fine — absence of `new` means human-opened.
 

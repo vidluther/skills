@@ -1,0 +1,6 @@
+interface:
+  display_name: "Marshal"
+  short_description: "Set up human and agent project conventions"
+  default_prompt: "Use $marshal to establish collaboration conventions for this repository."
+policy:
+  allow_implicit_invocation: false

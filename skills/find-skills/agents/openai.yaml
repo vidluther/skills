@@ -1,0 +1,4 @@
+interface:
+  display_name: "Find Skills"
+  short_description: "Discover skills for specialized workflows"
+  default_prompt: "Use $find-skills to find a skill for this task."

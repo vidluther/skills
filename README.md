@@ -6,13 +6,13 @@ The name is from Chacha Chaudhary, the Indian comic series. Chacha is the brain 
 
 ## What's in here
 
-- **`skills/`** — a collection of skills (capability-shaped prompts) the agent can pick up and run. Each one is a SKILL.md plus optional supporting files. The skills live by themselves so they can be invoked individually (`/marshal`, `/tdd`, etc.) and read each other for cross-reference.
+- **`skills/`** — a collection of skills (capability-shaped prompts) the agent can pick up and run. Each one is a SKILL.md plus optional supporting files. The skills live by themselves so they can be invoked individually (`/marshal`, `/diagnose`, etc.) and read each other for cross-reference.
 
 The skills currently cover, roughly:
 
 - **Project setup** — `marshal` (lays the rails: CLAUDE.md/AGENTS.md coherence, issue tracker, triage labels, domain doc layout, code style, version control conventions).
-- **Issue workflow** — `to-issues` (break a plan into tickets), `to-prd` (turn a conversation into a PRD).
-- **Implementation discipline** — `tdd` (red-green-refactor), `diagnose` (disciplined debugging loop), `improve-codebase-architecture` (find deepening opportunities).
+- **Issue workflow** — `to-issues` (break a plan into tickets).
+- **Implementation discipline** — `diagnose` (disciplined debugging loop), `improve-codebase-architecture` (find deepening opportunities).
 - **Design / collaboration** — `rubber-duck` (interview the user about a plan, challenging it against the project's domain language and capturing decisions when the project documents them), `reconcile-plans` (the follow-up to `rubber-duck`: reconcile multiple plans for the same work — produced by different models or sessions — into one, surfacing where they agree, where they diverge, and the catches only one model noticed, optionally convening a lens-based review council), `zoom-out` (step back from current work).
 - **Stack-specific helpers** — `migrate-oxlint`.
 
@@ -37,4 +37,3 @@ Vendored third-party skills record where they came from in their `SKILL.md` fron
 I highly recommend you view the skills here, and elsewhere, before you decide to start using them yourself. Take a look at [Skillspector](https://github.com/nvidia/skillspector) and see if the skills you have do anything dangerous, and decide if you want to risk it or not.
 
 This matters more than it looks. A skill is not documentation — it's instructions an agent *executes* while holding real tools (shell, file edits, MCP). A third-party skill is therefore code you run. That's why vendored skills here are **never auto-updated**: auto-pulling upstream would be an unattended supply-chain channel (upstream changes the prompt, your next agent run obeys it). Updates are deliberate and reviewed — `./update-thirdparty-skills.sh <name>` shows the upstream diff and runs `skillspector scan --no-llm`, you read it for injection-style changes a scanner can't catch, then you hand-merge. Don't automate that gate away.
-

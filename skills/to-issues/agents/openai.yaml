@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan to Issues"
+  short_description: "Turn plans into vertical-slice tracker issues"
+  default_prompt: "Use $to-issues to break this plan into implementation issues."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Diagnose"
+  short_description: "Diagnose difficult bugs systematically"
+  default_prompt: "Use $diagnose to investigate this bug systematically."

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Zoom Out"
+  short_description: "Map unfamiliar code at a higher level"
+  default_prompt: "Use $zoom-out to map this unfamiliar code area."
+policy:
+  allow_implicit_invocation: false

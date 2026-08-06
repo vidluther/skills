@@ -1,0 +1,4 @@
+interface:
+  display_name: "Improve Codebase Architecture"
+  short_description: "Find high-leverage codebase refactors"
+  default_prompt: "Use $improve-codebase-architecture to review this codebase's architecture."

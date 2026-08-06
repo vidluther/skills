@@ -103,9 +103,9 @@ Tool preference:
 
 1. **Debugger / REPL inspection** if the env supports it. One breakpoint beats ten logs.
 2. **Targeted logs** at the boundaries that distinguish hypotheses.
-3. Never "log everything and grep".
+3. Never "log everything and search it later".
 
-**Tag every debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`. Cleanup at the end becomes a single grep. Untagged logs survive; tagged logs die.
+**Tag every debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`. Cleanup at the end becomes a single `rg` search. Untagged logs survive; tagged logs die.
 
 **Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second.
 
@@ -131,8 +131,8 @@ Required before declaring done:
 
 - [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
 - [ ] Regression test passes (or absence of seam is documented)
-- [ ] All `[DEBUG-...]` instrumentation removed (`grep` the prefix)
+- [ ] All `[DEBUG-...]` instrumentation removed (`rg` the prefix)
 - [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
-- [ ] The hypothesis that turned out correct is stated in the commit / PR message — so the next debugger learns
+- [ ] The hypothesis that turned out correct is stated in the final handoff; if the user explicitly requested a commit or PR, include it in that message too
 
 **Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling) hand off to the `/improve-codebase-architecture` skill with the specifics. Make the recommendation **after** the fix is in, not before — you have more information now than when you started.

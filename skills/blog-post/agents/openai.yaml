@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blog Post"
+  short_description: "Develop and publish luther.io blog posts"
+  default_prompt: "Use $blog-post to work on my next luther.io blog post."

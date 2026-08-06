@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rubber Duck"
+  short_description: "Stress-test plans through structured questions"
+  default_prompt: "Use $rubber-duck to stress-test this plan with me."
