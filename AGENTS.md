@@ -57,7 +57,9 @@ Three destinations, two patterns:
 
 ## Third-party (vendored) skills
 
-Skills may be forks of public skill sets vendored into `skills/` and then adapted (currently four, all from mattpocock/skills: `diagnose`, `improve-codebase-architecture`, `rubber-duck`, `to-issues`). When vendored, they are **ours now** — we never auto-update them.
+Skills may be forks of public skill sets vendored into `skills/` and then adapted (currently three, all from mattpocock/skills: `diagnose`, `improve-codebase-architecture`, `rubber-duck`). When vendored, they are **ours now** — we never auto-update them.
+
+When a vendored skill diverges so far that upstream is no longer a useful source of updates (e.g. `to-issues`), de-vendor it: remove the provenance fields from its frontmatter and credit the origin in a line at the end of the skill body instead.
 
 **Why no auto-update:** a skill is instructions an agent *executes* while holding real tools (shell, file edits, MCP), so a vendored skill is third-party *code you run*. Auto-pulling upstream would be an unattended supply-chain channel — upstream changes the prompt, the next agent run obeys it. So upstream is a place we shop on need, not a feed we sync from. (Full rationale in the README "Security" section. Do not "helpfully" automate this away.)
 
