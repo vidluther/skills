@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitButler"
+  short_description: "Drive version control with the GitButler CLI (but)"
+  default_prompt: "Use $gitbutler to commit, branch, and manage version control with GitButler."

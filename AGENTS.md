@@ -65,6 +65,8 @@ When a vendored skill diverges so far that upstream is no longer a useful source
 
 A vendored skill records its origin in the flat top-level frontmatter fields above. The presence of `source:` is what marks a skill as vendored; `rg '^source:' skills/*/SKILL.md` audits them. Bespoke skills have no `source:`.
 
+**Special case — `gitbutler`:** vendored from the `but agent setup` wizard (GitButler CLI), not a git repo, so it has no `source:` frontmatter — the wizard version-stamps `SKILL.md` itself (`version:`). Its `SKILL.md` is wizard-owned: leave it (including `name: but`) untouched so future wizard runs diff cleanly. To update, re-run `but agent setup`, diff what it writes, then copy the regenerated `~/.claude/rules/gitbutler.md` over `gitbutler-steering.md` — **not** via `update-thirdparty-skills.sh`. The steering block in `gitbutler-steering.md` is mirrored into agent instruction files by `setup.sh`.
+
 ### Updating a vendored skill
 
 On need only — when the skill misbehaves, or you want a capability upstream gained. Not on a schedule (staleness here is a correctness annoyance; the update itself is the risky moment).

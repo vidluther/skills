@@ -24,7 +24,7 @@ cd ~/work/personal/skills
 ./setup.sh
 ```
 
-`setup.sh` symlinks each `skills/<name>/` into `~/.claude/skills/<name>` (the location Claude Code reads user-level skills from), so the skills become invokable via `/<name>` in any session. Idempotent — safe to re-run after adding skills.
+`setup.sh` symlinks each `skills/<name>/` into the user-level skills directory of each agent — `~/.claude/skills`, `~/.gemini/antigravity/skills`, `~/.config/opencode/skills`, and `~/.codex/skills` — so the skills become invokable via `/<name>` in any session. Idempotent — safe to re-run after adding skills.
 
 ## Provenance
 
