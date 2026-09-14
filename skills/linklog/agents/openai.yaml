@@ -1,4 +1,0 @@
-interface:
-  display_name: "Linklog"
-  short_description: "Sync saved articles and develop blog ideas"
-  default_prompt: "Use $linklog to sync and review my saved articles."
