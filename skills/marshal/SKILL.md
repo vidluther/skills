@@ -43,16 +43,16 @@ Present a short summary of what you found, then move into the sections one at a 
 
 ### Section 1 — Repo coherence
 
-> **Explainer:** Claude Code reads `CLAUDE.md`; some other AI tools read `AGENTS.md`. If a repo has both, they need to stay in sync — otherwise humans and agents end up working from different rules. The cleanest setup is a single source of truth (one file, with the other symlinked to it). The `## Agent skills` block written by marshal lives in whichever file is canonical.
+> **Explainer:** Most AI tools read `AGENTS.md`; Claude Code reads `CLAUDE.md` if one exists and falls back to `AGENTS.md` otherwise (v2.1.277+; not on Bedrock or with telemetry disabled — those need a `CLAUDE.md` that imports `@AGENTS.md`). If a repo has both, they need to stay in sync — otherwise humans and agents end up working from different rules. The cleanest setup is a single `AGENTS.md`. The `## Agent skills` block written by marshal lives in whichever file is canonical.
 
 Detect:
 - If only one of `CLAUDE.md` / `AGENTS.md` exists — that's the canonical file. Done.
-- If both exist and one is a symlink to the other — already coherent. Note which is canonical.
+- If both exist and one is a symlink to the other — coherent, but note that a lone `AGENTS.md` now does the same job for Claude Code (see the explainer caveat). Note which is canonical.
 - If one is a thin shim that imports the other (e.g. `CLAUDE.md` containing just `@AGENTS.md`) — also coherent; the imported file is canonical.
 - If both exist as separate files — flag the drift. Show the user a diff and offer to:
-  - Symlink one to the other, or reduce one to an `@<other>.md` import shim (user picks which is canonical).
+  - Keep only `AGENTS.md` (fold anything Claude-specific into it), symlink one to the other, or reduce one to an `@<other>.md` import shim (user picks which is canonical).
   - Merge them manually (marshal stops here for this section; user resolves before re-running).
-- If neither exists — ask the user which to create (`CLAUDE.md` is the Claude Code default; pick `AGENTS.md` only if other AI tools are the primary readers).
+- If neither exists — propose `AGENTS.md` (every tool reads it). Suggest adding a `CLAUDE.md` shim containing `@AGENTS.md` only if the user runs Claude Code on Bedrock or with telemetry disabled.
 
 Never silently overwrite or merge. Drift between the two files often encodes intentional differences; surface, don't fix.
 
