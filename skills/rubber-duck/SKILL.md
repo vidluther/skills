@@ -29,7 +29,7 @@ Finding *facts* is your job, never mine. If something can be found by exploring 
 
 Do not act on the plan until I confirm we have reached a shared understanding.
 
-Once I confirm, offer to save the final plan as `docs/plans/<model>-<topic>.md` — `<model>` is a short slug for the model you are running on (fable, opus, kimi, gpt5, …), `<topic>` a kebab-case slug for the work (ask me if it isn't obvious). `/reconcile-plans` merges the saved plans into a final one. Suggest running this same interview on other models only when the work passes the ADR test — hard to reverse, surprising, or a real trade-off. For easily-changed work one plan is enough; don't encourage ceremony.
+Once I confirm, offer to save the final plan as `docs/plans/<model>-<topic>.md` — `<model>` is a short slug for the model you are running on (fable, opus, kimi, gpt6, …), `<topic>` a kebab-case slug for the work (ask me if it isn't obvious). `reconcile-plans` merges the saved plans into a final one. Suggest running this same interview on other models only when the work passes the ADR test — hard to reverse, surprising, or a real trade-off. For easily-changed work one plan is enough; don't encourage ceremony.
 
 </what-to-do>
 

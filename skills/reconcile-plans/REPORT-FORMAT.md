@@ -6,7 +6,7 @@ Template for `docs/plans/council-<topic>.md`. Keep every section; write "None" r
 # Council report — <topic>
 
 Date: <YYYY-MM-DD>
-Council: <inline analysis | full council (lenses run)>
+Council: <inline analysis | full council — lens → model, e.g. correctness → opus, simplicity → fable>
 
 ## Roster
 

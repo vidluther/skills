@@ -18,6 +18,8 @@ Collect the plans:
 
 Read every plan in full. Then confirm the roster with the user — one line per plan: file → model → one-sentence gist. Two plans is enough to run; if only one plan exists, say so and stop (there is nothing to reconcile — offer `rubber-duck` instead).
 
+**Check for self-authorship.** If you are the same model family as one of the plan authors (your model slug matches a roster entry), say so in the roster line — you're likely to find your own plan's framing more natural. Do steps 2–3 working from Plan A / Plan B / … labels, not model names, and when your own plan wins a divergence, name the strongest argument against it before recommending it.
+
 ## 2. Extract the decision points
 
 A plan is a walk through a decision tree. Before comparing prose, extract the decisions: for each plan, list the decision points it addresses and the position it takes (with its reasoning, compressed to a sentence). Align them across plans so the same decision is one row, even when plans name it differently or address it in different order.
@@ -39,16 +41,30 @@ Also record **blind spots**: decisions or risks *no* plan addressed. Unanimous s
 
 Default to the inline analysis above. Convene a council when the user asks for one, or offer it when the Divergent bucket dominates — a second layer of independent judgment is worth its cost exactly when the plans disagree most.
 
-The council is parallel subagents, each judging **all plans through one lens** (one agent per lens, via the Agent tool):
+The council is parallel subagents, each judging **all plans through one lens** (one agent per lens; if your harness has no subagents, run the lenses sequentially, each as a fresh pass):
 
-- **Correctness / feasibility** — does each plan survive contact with the actual codebase? This judge explores the repo and checks the plans' claims against it.
+- **Correctness / feasibility** — does each plan survive contact with the actual codebase? This judge explores the repo and checks the plans' claims against it (the only judge that needs the repo; in Claude Code, an `Explore` agent).
 - **Simplicity / YAGNI** — which plan delivers the outcome with the least machinery? What in each plan is speculative?
 - **Risk / failure modes** — how does each plan fail? Migration hazards, rollback stories, blast radius.
 - **Completeness** — what did each plan miss, and what did all of them miss?
 
-**Anonymize the plans before judging.** Present them to each judge as Plan A, Plan B, Plan C — never by model name. Judges knowing "this one is GPT" or "this one is Fable" invites brand bias; the arguments must win, not the logo. Keep the A/B/C → model mapping yourself and reveal it only in the final report.
+The other three judges only read the plans — make them read-only (in Claude Code, the `Plan` agent type).
 
-Each judge returns per-plan findings plus per-divergence verdicts. Fold these into the buckets from step 3 — a council doesn't replace the convergence analysis, it pressure-tests it.
+**Mix models where the harness allows it.** This skill exists because different models catch different things; judges that all run on the reconciler's model reintroduce that model's blind spots. If you can pick a subagent's model (e.g. Claude Code's per-agent `model` option), put at least one lens on a different model from yours, and record which model ran each lens in the report.
+
+**Anonymize the plans before judging.** Present them to each judge as Plan A, Plan B, Plan C (the same labels you used in steps 2–3) — never by model name. Judges knowing "this one is GPT" or "this one is Fable" invites brand bias; the arguments must win, not the logo. Keep the A/B/C → model mapping yourself and reveal it only in the final report.
+
+Give every judge the list of divergences from step 3 and require this return shape, so the verdicts fold back mechanically:
+
+```
+Lens: <lens>
+Divergences:
+- <decision>: favors Plan <X> | no preference — <one-sentence reason>
+Unique catches: <per plan, anything the other plans missed; or "None">
+Blind spots: <what no plan covered, through this lens; or "None">
+```
+
+Fold these into the buckets from step 3 — a council doesn't replace the convergence analysis, it pressure-tests it.
 
 ## 5. Report
 
@@ -58,6 +74,6 @@ Write the report to `docs/plans/council-<topic>.md` using the template in [REPOR
 
 Offer to draft the reconciled plan — `docs/plans/final-<topic>.md`: settled decisions adopted as-is, unique contributions folded in, and each divergence resolved.
 
-Resolve divergences with the user, not for them: walk the open decisions round-by-round, rubber-duck style — the divergences are an already-enumerated frontier, so ask the independent ones as one numbered round, recommendation offered on each, user confirms or redirects; decisions that depend on another still-open decision wait for a later round. For a long list, offer to hand the open decisions to `/rubber-duck` as the interview agenda.
+Resolve divergences with the user, not for them: walk the open decisions round-by-round, rubber-duck style — the divergences are an already-enumerated frontier, so ask the independent ones as one numbered round, recommendation offered on each, user confirms or redirects; decisions that depend on another still-open decision wait for a later round. For a long list, offer to hand the open decisions to `rubber-duck` as the interview agenda.
 
-When the final plan is approved, offer the natural next step: `/to-issues` to break it into tickets.
+When the final plan is approved, offer the natural next step: `to-issues` to break it into tickets.

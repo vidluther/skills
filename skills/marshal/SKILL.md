@@ -13,12 +13,12 @@ This is a prompt-driven skill, not a deterministic script. Explore the repo, pre
 ## Process overview
 
 1. **Explore** the repo's starting state (read whatever exists; don't assume).
-2. Walk the user through five sections **one at a time** — explain, ask, confirm, write. Don't dump the whole walkthrough up front.
+2. Walk the user through the sections — explain, ask, confirm, write. Sections 1–3 go one at a time (later ones build on earlier answers). Sections 4 and 5 are independent detection-and-record steps: present them together as one numbered round. Don't dump the whole walkthrough up front.
 3. After all five sections, summarise what was recorded and where.
 
 Each section follows the same shape:
-- **Explainer** — what this is, why agents need it, what changes if the user picks differently. Assume the user does not know the term.
-- **Detect** — read the repo (and where applicable, the user's `~/.claude/CLAUDE.md` for global preferences) to propose a default.
+- **Explainer** — what this is, why agents need it, what changes if the user picks differently. Open with a one-line summary; give the full explainer only if the user asks or seems unfamiliar with the term.
+- **Detect** — read the repo (and where applicable, the user's global agent instructions — see Explore) to propose a default.
 - **Decide** — present the choice, accept overrides, surface conflicts.
 - **Write** — update `CLAUDE.md` and/or `docs/agents/` files in place.
 
@@ -33,7 +33,7 @@ Read whatever exists. Don't assume.
 - `docs/agents/` — does marshal's prior output already exist?
 - `package.json`, lockfiles (`pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`, `bun.lockb`), `.eslintrc*`, `oxlint.json`, `vitest.config.*`, `tsconfig.json`, `pyproject.toml`, etc.
 - `.gitbutler/` directory; `.husky/` or `lefthook.yml`; recent commit messages (`git log --oneline -20`) to spot conventional-commits or other patterns.
-- `~/.claude/CLAUDE.md` — the user's global preferences. Used in sections 4 and 5 to flag conflicts when project reality diverges.
+- The user's global agent instructions (`~/.claude/CLAUDE.md` in Claude Code, `~/.codex/AGENTS.md` in Codex — whichever your harness loads). Used in sections 4 and 5 to flag conflicts when project reality diverges.
 
 ## 2. Walk through the sections
 
@@ -48,8 +48,9 @@ Present a short summary of what you found, then move into the sections one at a 
 Detect:
 - If only one of `CLAUDE.md` / `AGENTS.md` exists — that's the canonical file. Done.
 - If both exist and one is a symlink to the other — already coherent. Note which is canonical.
+- If one is a thin shim that imports the other (e.g. `CLAUDE.md` containing just `@AGENTS.md`) — also coherent; the imported file is canonical.
 - If both exist as separate files — flag the drift. Show the user a diff and offer to:
-  - Symlink one to the other (user picks which is canonical).
+  - Symlink one to the other, or reduce one to an `@<other>.md` import shim (user picks which is canonical).
   - Merge them manually (marshal stops here for this section; user resolves before re-running).
 - If neither exists — ask the user which to create (`CLAUDE.md` is the Claude Code default; pick `AGENTS.md` only if other AI tools are the primary readers).
 
@@ -63,18 +64,22 @@ The `## Agent skills` block goes in the canonical file.
 
 > **Explainer:** The "issue tracker" is where issues live for this repo. Skills like `to-issues` read from and write to it — they need to know whether to call `gh issue create` or follow some other workflow you describe. Pick the place you actually track work for this repo.
 
-Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. Otherwise (or if the user prefers), offer:
+Propose the tracker the evidence points to — a GitHub remote suggests GitHub Issues, but ask, since many teams track work elsewhere. `to-issues` probes each tracker's native fields, so any tracker works. Offer:
 
 - **GitHub** — issues live in the repo's GitHub Issues (uses the `gh` CLI).
-- **Other** (GitLab, Jira, Linear, etc.) — ask the user to describe the workflow in one paragraph; the skill will record it as freeform prose in `docs/agents/issue-tracker.md`.
+- **Other** (Jira, Linear, GitLab, etc.) — ask the user to describe the workflow in one paragraph (project/team key, and which CLI or MCP tools reach it); record it as freeform prose in `docs/agents/issue-tracker.md`.
 
 #### Triage label vocabulary
 
-> **Explainer:** When an incoming issue is triaged, it gets tagged with **state** labels (`needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) so anyone — human or agent — can tell at a glance what's actionable. Issues created via `to-issues` also get a **provenance** label (`new`) so agent-created issues are distinguishable from human-opened ones. To do this, the actual label strings in your tracker need to match what the skills expect. If your repo already uses different vocabulary (e.g. `untriaged` instead of `new`), record the mapping here so the skill applies the right ones instead of creating duplicates.
+> **Explainer:** Issues created via `to-issues` get a **provenance** label (`new`) so agent-created issues are distinguishable from human-opened ones, and a **work-type** label (`afk` / `hitl`) saying whether an agent can take it unattended. If you also triage issues by hand, **state** labels (`needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) tell anyone at a glance what's actionable — optional; no skill applies them automatically. To do this, the actual label strings in your tracker need to match what the skills expect. If your repo already uses different vocabulary (e.g. `untriaged` instead of `new`), record the mapping here so the skill applies the right ones instead of creating duplicates.
 
 Canonical vocabulary:
 
-**State labels** (mutually exclusive; one per triaged issue):
+**Work-type labels** (applied by `to-issues`; mutually exclusive):
+- `afk` — can be implemented and merged without human interaction
+- `hitl` — needs a human (design review, architectural decision, manual testing)
+
+**State labels** (optional, for human triage; mutually exclusive; one per triaged issue):
 - `needs-info` — waiting on reporter for more information
 - `ready-for-agent` — fully specified, AFK-ready (an agent can pick it up with no human context)
 - `ready-for-human` — needs human implementation (judgment calls, external access, design decisions, manual testing)
@@ -94,7 +99,7 @@ An issue with **no state label** is in the inbox — it hasn't been triaged yet.
 For GitHub trackers, run `gh label list --json name,description,color` to enumerate existing labels. Then:
 
 1. **Map canonical → repo labels.** For each canonical label, ask the user whether the repo already uses a different string. Default: each role's string equals its name.
-2. **Create missing canonical labels.** If any of the 7 canonical labels don't physically exist in the tracker, offer to create them via `gh label create <name> --description "<meaning>" --color <hex>`. Otherwise `gh issue edit --add-label` will fail at runtime when a skill tries to apply them. Sensible defaults: `needs-info` orange, `ready-for-agent` green, `ready-for-human` blue, `wontfix` grey, `new` light blue, `bug` red, `enhancement` purple.
+2. **Create missing canonical labels.** If any canonical labels the user wants don't physically exist in the tracker, offer to create them via `gh label create <name> --description "<meaning>" --color <hex>`. Otherwise `gh issue edit --add-label` will fail at runtime when a skill tries to apply them. Sensible defaults: `afk` teal, `hitl` yellow, `needs-info` orange, `ready-for-agent` green, `ready-for-human` blue, `wontfix` grey, `new` light blue, `bug` red, `enhancement` purple.
 3. **Record non-canonical labels.** Everything else (`security`, `p0`, `area:auth`, `regression`, etc.) gets recorded in `docs/agents/triage-labels.md` under "Other labels in this repo". Skills surface these in agent briefs so implementing agents see the full context (an issue with `ready-for-agent + security` should be handled very differently from a routine `ready-for-agent + bug`).
 
 For non-GitHub trackers, ask the user to describe the equivalent vocabulary as freeform prose.
@@ -129,13 +134,13 @@ From the repo:
 - **Test framework**: `vitest.config.*` or `vitest` script → vitest. `jest.config.*` or `jest` script → jest. Other (mocha, ava, node:test): record what's there.
 - **Language**: `tsconfig.json` → TypeScript. `pyproject.toml` → Python (record uv/poetry/pip from there). `Cargo.toml` → Rust. Etc. Detect the primary language(s).
 
-From `~/.claude/CLAUDE.md`: read it as plain text and note the user's global preferences (the user's CLAUDE.md typically has a "Code Style" or "Tool Preferences" section).
+From the user's global agent instructions: read them as plain text and note global preferences (typically a "Code Style" or "Tool Preferences" section).
 
 #### Flag conflicts
 
 If repo reality and global prefs diverge, surface explicitly:
 
-> "This repo uses `eslint` + `jest` + `npm`. Your global prefs are `oxlint` + `vitest` + `pnpm`. Marshal will record the repo's current state — your global rule already says 'follow whatever tooling is already configured, don't introduce new tools without asking.' If you want to migrate, that's a separate task (`/migrate-oxlint` for the linter side)."
+> "This repo uses `eslint` + `jest` + `npm`. Your global prefs are `oxlint` + `vitest` + `pnpm`. Marshal will record the repo's current state — your global rule already says 'follow whatever tooling is already configured, don't introduce new tools without asking.' If you want to migrate, that's a separate task (`migrate-oxlint` for the linter side)."
 
 Never auto-migrate. Marshal only records.
 
@@ -161,7 +166,7 @@ From the repo:
 - **Commit style**: `git log --oneline -20` — look for conventional-commits prefixes (`feat:`, `fix:`), present-tense verbs, ticket numbers, etc. Note the dominant style.
 - **Branch model**: `git branch --remotes` and a recent merge commit — look for `main` vs `master`, evidence of trunk-based vs gitflow, etc.
 
-From `~/.claude/CLAUDE.md`: note any version-control preferences (e.g. the user's global CLAUDE.md may say "use `but` not `git`" or "do not commit unless explicitly asked").
+From the user's global agent instructions: note any version-control preferences (e.g. they may say "use `but` not `git`" or "do not commit unless explicitly asked").
 
 #### Flag conflicts
 
@@ -175,7 +180,7 @@ Update or create a `## Version Control` section in `CLAUDE.md`. Capture:
 - Whether agents should commit/push/open PRs proactively, or only when asked.
 - Anything specific to this repo (e.g. "always run tests before pushing", "never force-push to main").
 
-If the user's global `~/.claude/CLAUDE.md` already states a strong preference (e.g. "do not commit unless explicitly asked"), don't duplicate it here unless the repo overrides it.
+If the user's global agent instructions already state a strong preference (e.g. "do not commit unless explicitly asked"), don't duplicate it here unless the repo overrides it.
 
 ---
 
@@ -231,4 +236,4 @@ For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch us
 Tell the user:
 - Which sections were recorded and where.
 - That they can edit `docs/agents/*.md` and `CLAUDE.md` directly later — re-running marshal is only necessary if they want to change a section's underlying decisions.
-- Pointers to follow-up skills if relevant (e.g. `/update-config` for hooks, `/migrate-oxlint` if a linter conflict was flagged, `/rubber-duck` to start filling `CONTEXT.md`).
+- Pointers to follow-up skills if relevant (e.g. `update-config` for hooks (Claude Code), `migrate-oxlint` if a linter conflict was flagged, `rubber-duck` to start filling `CONTEXT.md`).

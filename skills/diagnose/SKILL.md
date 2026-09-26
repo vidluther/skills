@@ -11,13 +11,15 @@ last_reviewed: 2026-08-06
 
 A discipline for hard bugs. Skip phases only when explicitly justified.
 
+**Scale to the bug.** If the cause is already evident — a stack trace pointing at the faulty line, a typo, an obvious off-by-one — don't run the full loop: write the regression test at the right seam, watch it fail, fix, watch it pass, and say which phases you skipped and why. Use the full discipline when the cause isn't evident or your first fix didn't hold.
+
 When exploring the codebase, use the project's domain glossary to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
 ## Phase 1 — Build a feedback loop
 
 **This is the skill.** Everything else is mechanical. If you have a **tight** pass/fail signal for the bug — one that goes red on _this_ bug — you will find the cause; bisection, hypothesis-testing, and instrumentation all just consume it. If you don't have one, no amount of staring at code will save you.
 
-Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give up.**
+Spend disproportionate effort here, and be creative — most bugs that look loop-proof aren't.
 
 ### Ways to construct one — try them in roughly this order
 
@@ -61,7 +63,7 @@ Phase 1 is done when the loop is **tight** and **red-capable**: you can name **o
 - [ ] **Fast** — seconds, not minutes.
 - [ ] **Agent-runnable** — you can run it unattended; a human in the loop only via `scripts/hitl-loop.template.sh`.
 
-If you catch yourself reading code to build a theory before this command exists, **stop — jumping straight to a hypothesis is the exact failure this skill prevents.** No red-capable command, no Phase 2.
+If you catch yourself reading code to build a theory before this command exists, stop: jumping straight to a hypothesis is the failure this skill exists to prevent. No red-capable command, no Phase 2 (unless the scale-to-the-bug exception above applies).
 
 ## Phase 2 — Reproduce + minimise
 
@@ -135,4 +137,4 @@ Required before declaring done:
 - [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
 - [ ] The hypothesis that turned out correct is stated in the final handoff; if the user explicitly requested a commit or PR, include it in that message too
 
-**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling) hand off to the `/improve-codebase-architecture` skill with the specifics. Make the recommendation **after** the fix is in, not before — you have more information now than when you started.
+**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling) hand off to the `improve-codebase-architecture` skill with the specifics. Make the recommendation **after** the fix is in, not before — you have more information now than when you started.

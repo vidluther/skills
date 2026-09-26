@@ -2,7 +2,14 @@
 
 The skills speak in terms of canonical roles. This file maps those roles to the actual label strings used in this repo's issue tracker, and records any other labels the repo uses so agent briefs surface full context.
 
-## State labels (mutually exclusive; one per triaged issue)
+## Work-type labels (applied by `to-issues`; mutually exclusive)
+
+| Canonical label | Label in our tracker | Meaning                                              |
+| --------------- | -------------------- | ---------------------------------------------------- |
+| `afk`           | `afk`                | An agent can implement and merge it unattended       |
+| `hitl`          | `hitl`               | Needs a human: design review, decision, manual test  |
+
+## State labels (optional, for human triage; mutually exclusive)
 
 | Canonical label   | Label in our tracker | Meaning                                       |
 | ----------------- | -------------------- | --------------------------------------------- |

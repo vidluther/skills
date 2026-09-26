@@ -19,7 +19,7 @@ Read the idea note's `status` and run the matching stage below. Pipeline: `spark
 
 ## spark → outlined: interview, then outline
 
-Interview Vid **one question at a time** (see the `rubber-duck` skill for the technique — recommendation offered with each question, wait for the answer, follow the branch). Target his raw material, not facts you can look up:
+Interview Vid in **rounds** (see the `rubber-duck` skill for the technique — ask every independent question as one numbered round, recommendation offered with each, wait for the answers, follow the branches). Target his raw material, not facts you can look up:
 
 - What's his actual take? Where does he *disagree* with the source articles?
 - What personal story/experience makes this his post rather than a summary?
@@ -53,7 +53,7 @@ When Vid says it's ready: read the `_`-file, review for (in order) argument cohe
 1. Rename to drop the `_` prefix.
 2. `pnpm run build` again; confirm the post appears.
 3. Version control: repo uses GitButler (`gitbutler/workspace` branch) → use `but`, never plain git. **Do not commit or push unless Vid explicitly says to** (his global rule).
-4. Set status `published` in note + hub; move the idea's linklog sources to final state if any were still open.
+4. Set status `published` in note + hub.
 
 ## Wrap-up (every stage)
 

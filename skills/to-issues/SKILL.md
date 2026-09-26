@@ -7,7 +7,7 @@ description: Break a plan, spec, or PRD into independently-grabbable issues on t
 
 Break a plan into independently-grabbable issues using vertical slices (tracer bullets).
 
-The issue tracker and triage label vocabulary should have been provided to you — run `/marshal` if not.
+The issue tracker and triage label vocabulary should have been provided to you — run the `marshal` skill if not.
 
 ## Process
 
@@ -25,7 +25,7 @@ Look for opportunities to prefactor the code to make the implementation easier. 
 
 Before drafting, discover what this project's tracker natively supports: issue types, labels, priority, and sizing (Linear's estimate field, if enabled for the team; Jira story points or custom fields such as t-shirt size — check the issue type's field metadata; GitHub labels and Projects fields).
 
-Metadata goes in native fields, never in body prose. Only data with no native home earns a body header line (e.g. **Repo:** / **Files:** in a multi-repo project). If the tracker has no sizing field, omit sizing entirely — free-form metadata text just takes up space. HITL/AFK is expressed as a label, never in the body.
+Metadata goes in native fields, never in body prose. Only data with no native home earns a body header line (e.g. **Repo:** / **Files:** in a multi-repo project). If the tracker has no sizing field, omit sizing entirely — free-form metadata text just takes up space. HITL/AFK is expressed as the work-type label (`hitl` / `afk`, mapped in the triage-labels doc), never in the body.
 
 ### 4. Draft vertical slices
 
