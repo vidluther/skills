@@ -41,34 +41,58 @@ workspace (gitbutler/workspace)
 
 ## CLI IDs: Short Identifiers
 
-Every object gets a short, human-readable CLI ID shown in `but status`. IDs are generated per-session and are unique across all entity types (no two objects share an ID) — always read them from `but status`.
+Every object gets a short, human-readable CLI ID shown in `but status` or `but diff`. IDs are generated per-session and are unique across all entity types (no two objects share an ID) — always read them from current command output.
 
 ```
-Commits:    1, kyn, mpq#0  (short change-ID prefix when the commit has one, sha prefix otherwise;
-                             a #N suffix disambiguates commits sharing a change ID)
-Branches:   fe, bu, ui     (unique 2–3 char substring of the branch name, e.g. "fe" from "feature-x";
-                             falls back to auto-generated ID if no unique substring exists)
-Files:      g, qs, uo      (derived from the file path, long enough to be unique)
-Hunks:      g:5, uo:d      (<file-id>:<hunk-id>; the hunk part is derived from the hunk's content)
-Committed files: kyn:n     (<commit-id>:<file-id>, shown under each commit in `but status -fv`)
-Stacks:     m0, n0          (auto-generated, 2–3 chars)
+Commits:          1, ton, mpq#0       (short change-ID prefix when the commit has one, sha prefix otherwise;
+                                   a #N suffix disambiguates commits sharing a change ID)
+Branches:         fe, bu, ui          (unique 2–3 char substring of the branch name, e.g. "fe" from "feature-x";
+                                   falls back to auto-generated ID if no unique substring exists)
+Files:            uvw, qyo            (derived from the file path, long enough to be unique)
+Hunks:            uvw:2e4, uvw:e2c    (<file-id>:<hunk-id>; uncommitted hunks shown by bare `but diff`)
+Committed files:  mzm:uvw             (<commit-id>:<file-id>, shown under each commit in `but status -fv`)
+Committed hunks:  mzm:uvw:2e4         (<commit-id>:<file-id>:<hunk-id>, shown by `but diff <commit-id>`)
+Stacks:           m0, n0              (auto-generated, 2–3 chars)
 ```
 
-**Why?** Git commit SHAs are long (40 chars). CLI IDs are short, variable-length, and unique within your current workspace context. Commits, files, and hunks may use a single character when that is unambiguous.
+**ID lengths:** When an agent is detected, shortened change-ID, file, and hunk prefixes have a three-character minimum; SHA prefixes and branch/worktree IDs can be shorter.
 
 **Reading status output:** the first token on each line is that line's ID. Verbose commit lines append an informational `(sha …)` after the timestamp — it changes on every amend; do not pass it to commands.
 
-**Stability:** File/hunk IDs copied from the current output generally remain usable across ordinary commits, so you can reference several in a row, including across chained `but commit` calls. If an ID stops resolving, re-read the diff and continue. Commit IDs are change-ID prefixes when the commit has a change ID and sha prefixes otherwise. Change-ID refs survive history edits (`amend`, `squash`, `move`, `uncommit`, `reword`); sha refs and `#N`-suffixed refs do not — a stale sha can silently resolve to the wrong commit. History edits may run in sequence off one status read when every ref involved is a change-ID ref; otherwise run them one at a time with `--status-after` to get the next ref.
+**Stability:** Branch short IDs identify branches only within the workspace snapshot that produced them; branch names remain stable across unrelated workspace mutations. File/hunk IDs copied from the current output generally remain usable across ordinary commits, so you can reference several in a row, including across chained `but commit` calls. If an ID stops resolving, re-read the diff and continue. Commit IDs are change-ID prefixes when the commit has a change ID and sha prefixes otherwise. Change-ID refs survive history edits (`amend`, `squash`, `move`, `uncommit`, `reword`); sha refs and `#N`-suffixed refs do not — a stale sha can silently resolve to the wrong commit. History edits may run in sequence off one status read when every ref involved is a change-ID ref; otherwise run them one at a time with `--status-after` to get the next ref.
 
 **Usage:** Pass these IDs as arguments to commands:
 
 ```bash
-but commit -b <branch-id> -m "message" <file-or-hunk-id>   # Commit selected changes to a branch
+but commit -b <branch-name> -m "message" <file-or-hunk-id>   # Commit selected changes to a branch
 but amend -t <commit-id> <file-or-hunk-id> <file-or-hunk-id>  # Amend file(s) or hunk(s) into commit
 but squash <commit-id> -t <commit-id> -m "message"         # Squash commits
+but move <commit-id>:<file-id> --above <commit-id>           # Reposition a committed file
+but move <commit-id>:<file-id>:<hunk-id> --above <commit-id> # Reposition a committed hunk
 ```
 
 IDs are positional and space-separated. `but help cli-ids` documents every ID kind in detail.
+
+**Worktrees** (experimental, only with the `worktreeManipulation` feature flag on): each
+active worktree gets its own ID and is drawn in `but status` as a lane — a braced
+`{<branch>}` heading (the worktree name when its `HEAD` is detached) nested above the commit the
+worktree rests on — another worktree's commit included, lanes nest recursively — or standing on
+its own below the stacks when it rests outside the workspace.
+The lane lists that worktree's uncommitted files and commits. The heading ID names the worktree;
+`<worktree>:@` (ID or name) names its uncommitted area. `<worktree>:<path>` scopes a
+filename to it — `@:<path>` keeps meaning the main worktree. A filename dirty in several
+worktrees at once is ambiguous; the error suggests the scoped forms. A worktree file ID or
+`<worktree>:@` works as a `but commit` change and a `but amend`
+source: the change lands on the target and leaves that worktree's uncommitted area. Without a
+target flag, worktree changes commit to the tip of the worktree's own branch; an explicit target
+commit or branch does not have to be the worktree's own. One operation reads from one worktree
+at a time — a selection mixing worktrees is refused. A worktree is also a target: `but commit`,
+`but move`, and `but pick` with `-b <worktree-id-or-its-branch-name>` or `--below <worktree-id>`
+place the commit on the tip of the branch the worktree has checked out (`--above` is refused —
+that is its uncommitted area). A worktree's own commits carry ordinary commit IDs: `reword`, `move`,
+`squash`, and `pick` accept them, and the worktree's branch and checkout follow the rewrite.
+Uncommitting one lands in that worktree's uncommitted area, so `squash -t` names it by the
+worktree's area ID (`<id>:@`), not `@`; `but uncommit` infers it.
 
 ## Parallel vs Stacked Branches
 
@@ -93,7 +117,7 @@ Example: Adding a new API endpoint and updating button styles are independent.
 
 **To stack an existing branch** on top of another: `but move <child-branch-name> --above <parent-branch-name>`.
 
-**To create a new stacked branch** from scratch: `but branch new <name> -a <anchor>` — only use this when the child branch doesn't exist yet.
+**To create a new stacked branch** from scratch: `but branch new <name> --above <parent-branch-name>` — only use this when the child branch doesn't exist yet.
 
 ```
 main ── authentication ── user-profile ── settings-page
@@ -125,36 +149,36 @@ but move feature/frontend --unstack
 ## The Editing Model
 
 History editing is expressed as *sources* and a *target*. Sources are positional CLI IDs; the target
-is a flag. `zz` is a special ID meaning "the uncommitted area".
+is a flag. `@` is a special ID meaning "the uncommitted area".
 
 `but squash` carries most of the model — what it does depends on the kinds you combine:
 
 | Sources          | Target (`-t`) | Operation                         | Example                       |
 | ---------------- | ------------- | --------------------------------- | ----------------------------- |
 | Commit(s)        | Commit        | Squash commits together           | `but squash mm -t nn -m "…"`  |
-| Branch           | Commit        | Squash a branch into a commit     | `but squash bu -t nn -m "…"`  |
-| Commit(s)        | Branch        | Squash into the branch's newest   | `but squash mm -t bu -m "…"`  |
-| Branch           | *(none)*      | Squash the branch into one commit | `but squash bu -m "…"`        |
+| Branch           | Commit        | Squash a branch into a commit     | `but squash <branch-name> -t nn -m "…"` |
+| Commit(s)        | Branch        | Squash into the branch's newest   | `but squash mm -t <branch-name> -m "…"` |
+| Branch           | *(none)*      | Squash the branch into one commit | `but squash <branch-name> -m "…"`       |
 | Uncommitted file | Commit        | Amend the change into a commit    | `but squash a1 -t nn`         |
-| `zz`             | Commit        | Amend everything into a commit    | `but squash zz -t nn`         |
-| Commit           | `zz`          | Uncommit the commit               | `but squash mm -t zz`         |
-| Branch           | `zz`          | Uncommit and remove the branch    | `but squash bu -t zz`         |
-| Committed file   | Commit        | Move the file to another commit   | `but squash nn:a -t mm`       |
+| `@`              | Commit        | Amend everything into a commit    | `but squash @ -t nn`                     |
+| Commit           | `@`           | Uncommit the commit               | `but squash mm -t @`                     |
+| Branch           | `@`           | Uncommit and remove the branch    | `but squash <branch-name> -t @`          |
+| Committed change | Commit        | Move the change to another commit | `but squash nn:a -t mm`       |
 
-**Message flags:** commits or branches compose a NEW message unless the target is `zz`, so without
-`-m` they open an editor and block — always pass one. The remaining rows reuse the target's message
-and need no flag, and `-t zz` rejects message flags outright.
+**Message flags:** commits or branches compose a NEW message unless the target is `@` — always pass
+`-m`. Without it an agent run keeps the composed message (the joined source messages) and a terminal
+opens an editor. The remaining rows reuse the target's message and need no flag, and `-t @` rejects
+message flags outright.
 
 The two amend rows overlap with `but amend` — prefer `but amend -t nn a1`, which does only that and
-takes the same IDs. Reach for `squash` when the sources are commits, branches, or committed files,
-which `amend` does not accept.
+takes the same IDs.
 
 The other editing commands are narrower entry points on the same model:
 
-- `but amend -t <commit> <changes>` — amend uncommitted files/hunks into a known commit
-- `but uncommit <commits-branches-or-committed-files>` — move committed work back to uncommitted;
-  branches are removed, and committed files in one call must come from one commit
-- `but move <sources> --above|--below|--branch|--unstack` — relocate commits, committed files, or a
+- `but amend -t <commit> <changes>` — amend uncommitted changes into a known commit
+- `but uncommit <commits-branches-or-committed-changes>` — move committed work back to uncommitted;
+  branches are removed, and committed changes in one call must come from one commit
+- `but move <sources> --above|--below|--branch|--unstack` — relocate commits, committed changes, or a
   branch; this is the command with position control
 - `but discard <changes>` — drop work instead of relocating it
 
@@ -257,7 +281,7 @@ Branches can be in two states:
 
 ```bash
 but apply <branch-name>    # Make branch active
-but unapply <id>           # Make branch inactive
+but unapply <branch-name>  # Make branch inactive
 ```
 
 **Use cases:**
@@ -302,6 +326,6 @@ Git commands that don't modify state are safe to use:
 - `git commit` - Commits to the workspace merge commit, not your branch
 - `git checkout` - Breaks workspace model
 - `git rebase` - Conflicts with GitButler's management
-- `git merge` - Use `but land` instead
+- `git merge` - Use `but merge` instead
 
 **Rule of thumb:** If it reads, it's fine. If it writes, use `but` instead.
