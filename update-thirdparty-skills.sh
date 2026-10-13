@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sabu vendor check — review what changed upstream for a vendored (third-party)
+# Skills vendor check — review what changed upstream for a vendored (third-party)
 # skill, so you can hand-merge the bits you want.
 #
 # Why this is READ-ONLY: a skill is instructions an agent executes while holding
@@ -22,8 +22,8 @@
 
 set -euo pipefail
 
-SABU_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS_DIR="$SABU_DIR/skills"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILLS_DIR="$REPO_DIR/skills"
 
 TMP_ROOT="$(mktemp -d)"
 cleanup() { rm -rf "$TMP_ROOT"; }
