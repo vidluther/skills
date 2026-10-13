@@ -65,6 +65,17 @@ else
   echo "linked   $AGENT_SKILLS_DIR -> $SKILLS_DIR"
 fi
 
+# 1b) TWG (Atlassian) skills — installed by the twg CLI itself, not committed here
+# (proprietary licence; gitignored as skills/twg*/). Its canonical target is
+# ~/.agents/skills, which is this repo's skills/, so running it before step 2
+# lets link_skills_into fan the twg-* skills out to every agent like the rest.
+if command -v twg >/dev/null 2>&1; then
+  echo "running  twg skills install --yes"
+  twg skills install --yes
+else
+  echo "skip     twg skills (twg CLI not installed)"
+fi
+
 # 2) Per-skill destinations: one symlink per skill under each target dir.
 # Claude Code, Gemini Antigravity, OpenCode, and Codex all enumerate their skills
 # directory, so each skill needs its own entry rather than a single parent symlink.

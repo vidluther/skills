@@ -58,3 +58,7 @@ Backups.backupdb
 .MobileBackups.trash
 MobileBackups.trash
 tmbootpicker.efi
+
+# TWG skills — installed by `twg skills install` (see setup.sh), Atlassian-licensed
+skills/twg/
+skills/twg-*/
