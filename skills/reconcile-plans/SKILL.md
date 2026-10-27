@@ -72,8 +72,11 @@ Write the report to `docs/plans/council-<topic>.md` using the template in [REPOR
 
 ## 6. The final plan
 
-Offer to draft the reconciled plan — `docs/plans/final-<topic>.md`: settled decisions adopted as-is, unique contributions folded in, and each divergence resolved.
+Offer to draft the reconciled plan: settled decisions adopted as-is, unique contributions folded in, and each divergence resolved.
+
+- If the plans are ISA drafts (from `rubber-duck`), the result is the **final ISA** ([ISA-FORMAT.md](../rubber-duck/ISA-FORMAT.md)), written to the ISA location recorded in `docs/agents/isa.md` (default `docs/isa/<topic>.md`). Merge ISCs by meaning, not by number, and renumber once in the final ISA. Each resolved divergence becomes a dated Decisions entry.
+- Otherwise, write `docs/plans/final-<topic>.md`.
 
 Resolve divergences with the user, not for them: walk the open decisions round-by-round, rubber-duck style — the divergences are an already-enumerated frontier, so ask the independent ones as one numbered round, recommendation offered on each, user confirms or redirects; decisions that depend on another still-open decision wait for a later round. For a long list, offer to hand the open decisions to `rubber-duck` as the interview agenda.
 
-When the final plan is approved, offer the natural next step: `to-issues` to break it into tickets.
+When the final plan or ISA is approved, offer the natural next step: `to-issues` to break it into tickets.

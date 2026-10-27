@@ -1,0 +1,4 @@
+interface:
+  display_name: "ISA Check"
+  short_description: "Check the code against an initiative's ideal state criteria"
+  default_prompt: "Use $isa-check to tell me which ISCs in this initiative's ISA pass."

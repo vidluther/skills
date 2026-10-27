@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review PR"
+  short_description: "Digest someone else's PR into private review notes"
+  default_prompt: "Use $review-pr to review this pull request and give me notes."

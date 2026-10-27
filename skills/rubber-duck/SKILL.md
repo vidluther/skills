@@ -1,6 +1,6 @@
 ---
 name: rubber-duck
-description: Interview the user relentlessly about a plan or design, in rounds of independent questions, until reaching shared understanding — resolving each branch of the decision tree. When the project documents its domain (CONTEXT.md, ADRs), challenge the plan against that language and capture decisions inline. Use when the user wants to stress-test a plan or an issue, asks your opinion on a plan or design, or mentions "rubber-duck" / "rubberducking".
+description: Interview the user relentlessly about a plan or design, in rounds of independent questions, until reaching shared understanding — resolving each branch of the decision tree. When the project documents its domain (CONTEXT.md, ADRs), challenge the plan against that language and capture decisions inline. When planning an initiative, produces or updates its Ideal State Artifact (ISA). Use when the user wants to stress-test a plan or an issue, plan an initiative or write an ISA, asks your opinion on a plan or design, or mentions "rubber-duck" / "rubberducking".
 source: https://github.com/mattpocock/skills
 source_path: skills/productivity/grilling
 upstream_ref: 8b36d4fb2635b3c21998dcd8144439c9e5ba7302
@@ -29,7 +29,18 @@ Finding *facts* is your job, never mine. If something can be found by exploring 
 
 Do not act on the plan until I confirm we have reached a shared understanding.
 
-Once I confirm, offer to save the final plan as `docs/plans/<model>-<topic>.md` — `<model>` is a short slug for the model you are running on (fable, opus, kimi, gpt6, …), `<topic>` a kebab-case slug for the work (ask me if it isn't obvious). `reconcile-plans` merges the saved plans into a final one. Suggest running this same interview on other models only when the work passes the ADR test — hard to reverse, surprising, or a real trade-off. For easily-changed work one plan is enough; don't encourage ceremony.
+### When the plan is an initiative, the output is an ISA
+
+A quick stress-test of a single issue or idea needs no file. But when we're planning an **initiative** — a unit of intent someone would judge "done" as a whole — the interview's job is to produce an **Ideal State Artifact** ([ISA-FORMAT.md](./ISA-FORMAT.md)). One ISA per initiative, never one per issue. Steer the frontier so these get settled, in roughly this order: the ideal state in my words, the constraints, then the ISCs — each atomic and testable, with the cheapest eval rung that can judge it. A criterion no eval can judge isn't settled yet: keep asking.
+
+Before the first round, find out whether this initiative already has an ISA. Read `docs/agents/isa.md` if it exists — it says where ISAs live (in-repo `docs/isa/`, Confluence, a Jira epic, or split parent/child). If one exists, the interview **updates** it: every change to the ideal state, a constraint, or an ISC gets a dated Decisions entry. If the initiative belongs under a larger one, link its `Parent:` and inherit the parent's constraints rather than restating them.
+
+Once I confirm, offer to save the ISA:
+
+- **One model** (the default) — write the ISA to its recorded location; with no `docs/agents/isa.md`, use `docs/isa/<topic>.md`, `<topic>` a kebab-case slug (ask me if it isn't obvious). For an external location (Confluence, Jira), show me the draft and write it only after I approve, using the tracker tooling in `docs/agents/issue-tracker.md`.
+- **Several models** — only when the work passes the ADR test (hard to reverse, surprising, or a real trade-off). Save this session's ISA draft as `docs/plans/<model>-<topic>.md` — `<model>` a short slug for the model you are running on (fable, opus, kimi, gpt6, …) — and suggest running the same interview on other models. `reconcile-plans` merges the drafts into the final ISA. For easily-changed work one draft is enough; don't encourage ceremony.
+
+After the ISA is saved, offer `to-issues` to slice it into issues.
 
 </what-to-do>
 

@@ -1,6 +1,6 @@
 ---
 name: marshal
-description: Sets up project rails for human + AI collaboration. Walks through five sections — CLAUDE.md/AGENTS.md coherence, issue tracker + triage labels, domain doc layout, code-style conventions, and version-control conventions — recording the result so the engineering skills (`to-issues`, `diagnose`, `improve-codebase-architecture`, `zoom-out`) and any humans working alongside agents share the same baseline. Run on any new or existing repo before starting agent-driven work, or when those skills appear to be missing context.
+description: Sets up project rails for human + AI collaboration. Walks through six sections — CLAUDE.md/AGENTS.md coherence, issue tracker + triage labels, domain doc layout, intent docs (ISA) location, code-style conventions, and version-control conventions — recording the result so the engineering skills (`to-issues`, `diagnose`, `improve-codebase-architecture`, `zoom-out`) and any humans working alongside agents share the same baseline. Run on any new or existing repo before starting agent-driven work, or when those skills appear to be missing context.
 disable-model-invocation: true
 ---
 
@@ -8,13 +8,13 @@ disable-model-invocation: true
 
 Marshal lays the rails. It walks through the conventions an AI agent (and any humans working alongside one) needs to know to operate coherently inside a repo: where issues live, how they move through triage, where domain docs are kept, what code style is in force, and how work flows through git. The result is recorded in `CLAUDE.md` (or `AGENTS.md`) and `docs/agents/`, so every subsequent engineering skill reads the same playbook.
 
-This is a prompt-driven skill, not a deterministic script. Explore the repo, present what you found, confirm with the user, then write. Each of the five sections is independent — re-running marshal later only revisits the sections that changed.
+This is a prompt-driven skill, not a deterministic script. Explore the repo, present what you found, confirm with the user, then write. Each of the six sections is independent — re-running marshal later only revisits the sections that changed.
 
 ## Process overview
 
 1. **Explore** the repo's starting state (read whatever exists; don't assume).
-2. Walk the user through the sections — explain, ask, confirm, write. Sections 1–3 go one at a time (later ones build on earlier answers). Sections 4 and 5 are independent detection-and-record steps: present them together as one numbered round. Don't dump the whole walkthrough up front.
-3. After all five sections, summarise what was recorded and where.
+2. Walk the user through the sections — explain, ask, confirm, write. Sections 1–4 go one at a time (later ones build on earlier answers). Sections 5 and 6 are independent detection-and-record steps: present them together as one numbered round. Don't dump the whole walkthrough up front.
+3. After all six sections, summarise what was recorded and where.
 
 Each section follows the same shape:
 - **Explainer** — what this is, why agents need it, what changes if the user picks differently. Open with a one-line summary; give the full explainer only if the user asks or seems unfamiliar with the term.
@@ -30,10 +30,11 @@ Read whatever exists. Don't assume.
 - `CLAUDE.md` and `AGENTS.md` at the repo root — does either exist? If both, are they identical (a symlink), or have they drifted apart? Is there already an `## Agent skills` section?
 - `CONTEXT.md` and `CONTEXT-MAP.md` at the repo root.
 - `docs/adr/` and any `src/*/docs/adr/` directories.
+- `docs/isa/` and `docs/plans/` — existing intent docs (ISAs, or saved `rubber-duck` plans).
 - `docs/agents/` — does marshal's prior output already exist?
 - `package.json`, lockfiles (`pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`, `bun.lockb`), `.eslintrc*`, `oxlint.json`, `vitest.config.*`, `tsconfig.json`, `pyproject.toml`, etc.
 - `.gitbutler/` directory; `.husky/` or `lefthook.yml`; recent commit messages (`git log --oneline -20`) to spot conventional-commits or other patterns.
-- The user's global agent instructions (`~/.claude/CLAUDE.md` in Claude Code, `~/.codex/AGENTS.md` in Codex — whichever your harness loads). Used in sections 4 and 5 to flag conflicts when project reality diverges.
+- The user's global agent instructions (`~/.claude/CLAUDE.md` in Claude Code, `~/.codex/AGENTS.md` in Codex — whichever your harness loads). Used in sections 5 and 6 to flag conflicts when project reality diverges.
 
 ## 2. Walk through the sections
 
@@ -121,7 +122,32 @@ Offer to create empty `docs/adr/` and `.out-of-scope/` directories if they don't
 
 ---
 
-### Section 4 — How code is written
+### Section 4 — What we're building toward
+
+> **Explainer:** An **Ideal State Artifact (ISA)** is the written source of truth for what an initiative should become: ideal state, constraints, a dated decisions log, and atomic testable criteria (ISCs) with evals. There's one ISA per **initiative** (unit of intent), not per repo or per issue — `to-issues` slices an ISA into issues that cite the ISCs they satisfy, and a large project gets a parent ISA plus child ISAs per major intent. Agents need to know where ISAs live so they read the right one before working an issue. Full model: [isa.md](./isa.md).
+
+#### Detect
+
+- Existing `docs/isa/` or `docs/plans/` files.
+- Section 2's tracker — Jira suggests initiatives may live as epics with Confluence pages.
+
+#### Decide
+
+Ask: **do initiatives in this repo span other repos?** Then offer:
+
+- **In-repo** — `docs/isa/<topic>.md`. Initiatives live entirely in this repo.
+- **External** — Confluence page (record space + parent page) or the Jira epic description. Initiatives span repos; the repo keeps no copy.
+- **Split** — parent ISA external, child ISAs in-repo under `docs/isa/`, each linking its parent. One cross-repo project with repo-scoped intents.
+
+If `docs/plans/` holds saved plans, note them but don't migrate — that's the user's call.
+
+#### Write
+
+`docs/agents/isa.md` from [isa.md](./isa.md), with the chosen layout filled in under "Where ISAs live" and the other layouts removed. If in-repo or split, offer to create `docs/isa/` with a `.gitkeep`.
+
+---
+
+### Section 5 — How code is written
 
 > **Explainer:** Agents writing code for this repo need to follow the project's existing conventions — linter, formatter, test framework, package manager. Otherwise their output won't match house style and CI will reject it. Marshal records what the project uses so every agent reads the same answer.
 
@@ -155,7 +181,7 @@ If the section already exists, edit it in place; don't append a duplicate. Prese
 
 ---
 
-### Section 5 — How work moves
+### Section 6 — How work moves
 
 > **Explainer:** Agents need to know how this project handles version control: bare git, GitButler (`but` CLI), commit message conventions, branch model, whether they should propose merges or stop short. Recorded so every agent picks up the same workflow.
 
@@ -170,7 +196,7 @@ From the user's global agent instructions: note any version-control preferences 
 
 #### Flag conflicts
 
-Same pattern as Section 4. If the repo uses bare git but your global prefs say `but`, surface that as information, not as a thing to fix. Marshal records the repo reality.
+Same pattern as Section 5. If the repo uses bare git but your global prefs say `but`, surface that as information, not as a thing to fix. Marshal records the repo reality.
 
 #### Write
 
@@ -189,9 +215,9 @@ If the user's global agent instructions already state a strong preference (e.g. 
 Before writing anything to disk, show the user a draft of:
 
 - The `## Agent skills` block to add to the canonical `CLAUDE.md` / `AGENTS.md`.
-- The `## Code Style` section (if section 4 produced one).
-- The `## Version Control` section (if section 5 produced one).
-- The contents of `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md`.
+- The `## Code Style` section (if section 5 produced one).
+- The `## Version Control` section (if section 6 produced one).
+- The contents of `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md`, `docs/agents/isa.md`.
 
 Let them edit before writing.
 
@@ -221,13 +247,18 @@ The `## Agent skills` block:
 ### Domain docs
 
 [one-line summary of layout — "single-context" or "multi-context"]. See `docs/agents/domain.md`.
+
+### Intent docs (ISA)
+
+[one-line summary of where ISAs live — "in-repo", "external", or "split"]. See `docs/agents/isa.md`.
 ```
 
-Then write the three docs files using the seed templates in this skill folder as a starting point:
+Then write the four docs files using the seed templates in this skill folder as a starting point:
 
 - [issue-tracker-github.md](./issue-tracker-github.md) — GitHub issue tracker
 - [triage-labels.md](./triage-labels.md) — label mapping (state + provenance + non-canonical)
 - [domain.md](./domain.md) — domain doc consumer rules + layout
+- [isa.md](./isa.md) — ISA model, shape, and location
 
 For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch using the user's description.
 
