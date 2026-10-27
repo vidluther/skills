@@ -7,8 +7,6 @@
 #   convention; tools that follow it (or future hooks/configs this repo adds) read from here.
 # - $CLAUDE_SKILLS_DIR ($HOME/.claude/skills/<name>) — Claude Code-specific. Each skill
 #   needs its own entry in this directory because that's where Claude Code discovers them.
-# - $GEMINI_SKILLS_DIR ($HOME/.gemini/antigravity/skills/<name>) — Gemini Antigravity.
-#   Same per-skill shape as Claude Code; Antigravity enumerates this directory.
 # - $OPENCODE_SKILLS_DIR ($HOME/.config/opencode/skills/<name>) — OpenCode. Same shape.
 # - $CODEX_SKILLS_DIR ($HOME/.codex/skills/<name>) — Codex. Same shape.
 #
@@ -25,7 +23,6 @@ SKILLS_DIR="$REPO_DIR/skills"
 AGENTS_DIR="$HOME/.agents"
 AGENT_SKILLS_DIR="$AGENTS_DIR/skills"
 CLAUDE_SKILLS_DIR="$HOME/.claude/skills"
-GEMINI_SKILLS_DIR="$HOME/.gemini/antigravity/skills"
 OPENCODE_SKILLS_DIR="$HOME/.config/opencode/skills"
 CODEX_SKILLS_DIR="$HOME/.codex/skills"
 
@@ -44,7 +41,6 @@ if [ -L "$AGENTS_DIR" ]; then
 fi
 mkdir -p "$AGENTS_DIR"
 mkdir -p "$CLAUDE_SKILLS_DIR"
-mkdir -p "$GEMINI_SKILLS_DIR"
 mkdir -p "$OPENCODE_SKILLS_DIR"
 mkdir -p "$CODEX_SKILLS_DIR"
 
@@ -66,18 +62,29 @@ else
 fi
 
 # 1b) TWG (Atlassian) skills — installed by the twg CLI itself, not committed here
-# (proprietary licence; gitignored as skills/twg*/). Its canonical target is
-# ~/.agents/skills, which is this repo's skills/, so running it before step 2
-# lets link_skills_into fan the twg-* skills out to every agent like the rest.
-if command -v twg >/dev/null 2>&1; then
+# (proprietary licence; gitignored as skills/twg*). twg keeps the real copies in
+# ~/.config/twg/skills and symlinks them into ~/.agents/skills — which is this
+# repo's skills/ — so running it before step 2 lets link_skills_into fan them out
+# to every agent like the rest.
+# Only run it once ~/.agents/skills is our symlink: on a fresh machine, twg would
+# otherwise create ~/.agents/skills as a real directory, and step 1 would then
+# skip it forever, cutting the custom skills off from that location.
+if ! command -v twg >/dev/null 2>&1; then
+  echo "skip     twg skills (twg CLI not installed)"
+elif [ ! -L "$AGENT_SKILLS_DIR" ] || [ "$(readlink "$AGENT_SKILLS_DIR")" != "$SKILLS_DIR" ]; then
+  echo "skip     twg skills ($AGENT_SKILLS_DIR is not a symlink to $SKILLS_DIR; fix that first)"
+else
   echo "running  twg skills install --yes"
   twg skills install --yes
-else
-  echo "skip     twg skills (twg CLI not installed)"
 fi
 
+# Physical path of a directory (symlinks resolved), or empty if it doesn't exist.
+resolve_dir() {
+  (cd -P "$1" 2>/dev/null && pwd -P)
+}
+
 # 2) Per-skill destinations: one symlink per skill under each target dir.
-# Claude Code, Gemini Antigravity, OpenCode, and Codex all enumerate their skills
+# Claude Code, OpenCode, and Codex all enumerate their skills
 # directory, so each skill needs its own entry rather than a single parent symlink.
 link_skills_into() {
   local target_dir="$1" label="$2"
@@ -92,6 +99,11 @@ link_skills_into() {
     if [ -L "$link" ]; then
       current="$(readlink "$link")"
       if [ "$current" = "$src" ]; then
+        continue
+      fi
+      # Already lands in the same directory by another route (e.g. twg linking
+      # straight to ~/.config/twg/skills) — leave it, so runs don't flap.
+      if [ -n "$(resolve_dir "$link")" ] && [ "$(resolve_dir "$link")" = "$(resolve_dir "$src")" ]; then
         continue
       fi
       rm "$link"
@@ -112,14 +124,24 @@ link_skills_into() {
 }
 
 # 3) Report dangling symlinks in a per-skill destination (point at paths
-# that no longer exist — usually leftovers from a previous setup).
+# that no longer exist — usually leftovers from a previous setup). Dangling
+# twg* links are pruned automatically: twg removes skills it drops (it prunes
+# its own directories) but not the per-agent links to them.
 report_dangling() {
   local target_dir="$1"
-  local dangling=() entry
+  local dangling=() entry name
   for entry in "$target_dir"/*; do
     [ -L "$entry" ] || continue
     [ -e "$entry" ] && continue
-    dangling+=("$(basename "$entry") -> $(readlink "$entry")")
+    name="$(basename "$entry")"
+    case "$name" in
+      twg|twg-*)
+        rm "$entry"
+        echo "pruned   $entry (dangling twg skill link)"
+        continue
+        ;;
+    esac
+    dangling+=("$name -> $(readlink "$entry")")
   done
 
   if [ "${#dangling[@]}" -gt 0 ]; then
@@ -133,7 +155,6 @@ report_dangling() {
 }
 
 link_skills_into "$CLAUDE_SKILLS_DIR" "claude"
-link_skills_into "$GEMINI_SKILLS_DIR" "antigravity"
 link_skills_into "$OPENCODE_SKILLS_DIR" "opencode"
 link_skills_into "$CODEX_SKILLS_DIR" "codex"
 
@@ -212,7 +233,6 @@ else
 fi
 
 report_dangling "$CLAUDE_SKILLS_DIR"
-report_dangling "$GEMINI_SKILLS_DIR"
 report_dangling "$OPENCODE_SKILLS_DIR"
 report_dangling "$CODEX_SKILLS_DIR"
 

@@ -40,19 +40,18 @@ Skills cross-reference each other by name (e.g. `marshal` mentions `to-issues` a
 
 ## Distribution model (what setup.sh does)
 
-Five destinations, two patterns:
+Four destinations, two patterns:
 
 1. **`~/.agents/skills`** — a single parent symlink pointing at this repo's `skills/`. Tools that follow the AGENTS.md convention pick up everything under `skills/` automatically. If `~/.agents` is itself a symlink (e.g. managed by stow), setup bails so the user can decide.
 2. **`~/.claude/skills/<name>`** — one symlink per skill. Claude Code discovers user-level skills by enumerating this directory, so each skill needs its own entry.
-3. **`~/.gemini/antigravity/skills/<name>`** — one symlink per skill, same shape as Claude Code. Gemini Antigravity enumerates this directory.
-4. **`~/.config/opencode/skills/<name>`** — one symlink per skill, same shape. OpenCode enumerates this directory.
-5. **`~/.codex/skills/<name>`** — one symlink per skill, same shape. Codex enumerates this directory.
+3. **`~/.config/opencode/skills/<name>`** — one symlink per skill, same shape. OpenCode enumerates this directory.
+4. **`~/.codex/skills/<name>`** — one symlink per skill, same shape. Codex enumerates this directory.
 
 `setup.sh` also reproduces `but agent setup` (see the gitbutler special case below): it symlinks `gitbutler-steering.md` to `~/.claude/rules/gitbutler.md` and injects the steering block into `~/.codex/AGENTS.md` and `~/.config/opencode/AGENTS.md`.
 
-**TWG (Atlassian) skills** (`skills/twg*/`) are gitignored, not committed. If the `twg` CLI is on PATH, `setup.sh` runs `twg skills install --yes`, which writes them into `~/.agents/skills` (i.e. this repo's `skills/`), and the per-skill linking then fans them out to every agent. Update them with `twg upgrade` + `./setup.sh`, not by hand.
+**TWG (Atlassian) skills** (`skills/twg*`) are gitignored, not committed. If the `twg` CLI is on PATH, `setup.sh` runs `twg skills install --yes`: twg keeps the real copies in `~/.config/twg/skills` and symlinks them into `~/.agents/skills` (i.e. this repo's `skills/`) and some per-agent dirs, and the per-skill linking then fans them out to every agent. `setup.sh` only runs twg once `~/.agents/skills` is its symlink (otherwise twg would create a real directory there and cut off the custom skills), leaves any link that already resolves to the right directory, and prunes dangling `twg*` links. Update them with `twg upgrade` + `./setup.sh`, not by hand.
 
-`setup.sh` reports new symlinks, replaced symlinks (target moved), skipped real directories (won't clobber), and dangling symlinks (point at non-existent paths — usually leftovers from a renamed/removed skill; remove manually).
+`setup.sh` reports new symlinks, replaced symlinks (target moved), skipped real directories (won't clobber), and dangling symlinks (point at non-existent paths — usually leftovers from a renamed/removed skill; remove manually — except dangling `twg*` links, which it prunes).
 
 ## Adding a new skill
 
