@@ -15,6 +15,8 @@ The issue tracker and triage label vocabulary should have been provided to you �
 
 Work from whatever is already in the conversation context. If the user passes an issue reference (issue number, URL, or path) as an argument, fetch it from the issue tracker and read its full body and comments.
 
+If the source is an **ISA** (Ideal State Artifact — see `docs/agents/isa.md` for where they live), read it in full: its ISCs are the definition of done for every slice, its constraints bind every slice, and its Decisions log overrides anything older in the conversation. An ISA is sliced per initiative — for a parent ISA with child ISAs, slice each child, not the parent. If the user passes a plan that clearly describes an initiative but there's no ISA, say so and offer `rubber-duck` to write one first; proceed without it only if they decline.
+
 ### 2. Explore the codebase (optional)
 
 If you have not already explored the codebase, do so to understand the current state of the code. Issue titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
@@ -39,7 +41,10 @@ Slices may be 'HITL' or 'AFK'. HITL slices require human interaction, such as an
 - Each slice is sized to fit in a single fresh context window
 - Prefer many thin slices over few thick ones
 - Any prefactoring should be done first
+- From an ISA: each slice cites the ISC IDs it satisfies (fully or partly), and every ISC is covered by at least one slice
 </vertical-slice-rules>
+
+**Coverage check (ISA source only).** Before quizzing, map ISCs → slices. An ISC no slice covers is a gap — add a slice or flag it. A slice that covers no ISC is either prefactoring/spike work (fine — say so) or scope the ISA doesn't ask for (flag it; the ISA wins, or the user adds a Decisions entry). Don't split an ISC across slices so finely that no single slice can run its eval.
 
 **Prefer a spike when the plan rests on unverified assumptions.** If neither the plan nor the team has verified how an external system actually behaves (an undocumented API, a third-party app's real payloads, a retry policy nobody has observed), don't write implementation slices on top of the guess. The first slice manufactures the missing knowledge — stand up the smallest thing that lets you observe reality (a minimal server capturing real requests, a probe script) and write down what you learn. Downstream slices then build on evidence instead of assumed expertise.
 
@@ -55,6 +60,9 @@ Present the proposed breakdown as a numbered list. For each slice, show:
 - **Native fields**: proposed estimate, labels, priority — whatever step 3 found
 - **Blocked by**: which other slices (if any) must complete first
 - **User stories covered**: which user stories this addresses (if the source material has them)
+- **ISCs satisfied**: which ISC IDs this slice satisfies (if the source is an ISA)
+
+With an ISA source, follow the list with the coverage map: each ISC → the slices that satisfy it, with any uncovered ISC or ISC-less slice called out.
 
 Ask the user:
 
@@ -82,6 +90,7 @@ Publish issues in dependency order (blockers first) so you can reference real is
 
 - **Blocked by** — real issue identifiers, or "None — can start immediately".
 - **Parent** — reference to the parent issue, only if the source was an existing issue.
+- **Satisfies** — only if the source was an ISA: a link to the ISA plus the ISC IDs this issue satisfies, each restated in one plain sentence (the assignee hasn't read the ISA). Each cited ISC's eval also appears as an Acceptance bullet, phrased as the check to run.
 
 <task-template>
 **Context**
