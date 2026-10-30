@@ -63,3 +63,9 @@ tmbootpicker.efi
 skills/twg*
 skills/twg/
 skills/twg-*/
+
+# GitButler skill — generated from the installed `but` CLI by
+# scripts/refresh-gitbutler-skill.sh (setup.sh + agent session hooks).
+skills/gitbutler/*
+!skills/gitbutler/agents/
+gitbutler-steering.md
