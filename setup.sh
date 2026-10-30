@@ -111,7 +111,7 @@ link_skills_into() {
       echo "replaced $link (was -> $current)"
       replaced=$((replaced + 1))
     elif [ -e "$link" ]; then
-      echo "skip     $link (real directory exists; not overwriting)"
+      echo "skip     $link (real directory kept; see adopt step above)"
       skipped=$((skipped + 1))
     else
       ln -s "$src" "$link"
@@ -154,6 +154,45 @@ report_dangling() {
   fi
 }
 
+# 2a) Skills installed straight into an agent's directory by some other tool
+# (e.g. `rex skill setup`) are real directories, invisible to this repo. Ask
+# whether to adopt each one — move it into skills/ so it's tracked and linked
+# everywhere — or keep it where it is. Only directories with a SKILL.md count.
+# Non-interactive runs keep everything and just report.
+adopt_real_skills() {
+  local target_dir="$1"
+  local entry name answer
+  for entry in "$target_dir"/*/; do
+    entry="${entry%/}"
+    [ -L "$entry" ] && continue
+    [ -f "$entry/SKILL.md" ] || continue
+    name="$(basename "$entry")"
+
+    if [ -e "$SKILLS_DIR/$name" ]; then
+      echo "skip     $entry (real directory; skills/$name already exists in this repo — resolve by hand)"
+      continue
+    fi
+    if [ ! -t 0 ]; then
+      echo "keep     $entry (real directory; re-run interactively to adopt it)"
+      continue
+    fi
+
+    echo
+    echo "found    $entry (real directory, not from this repo)"
+    read -r -p "         [m]ove into skills/ and track it, or [k]eep it here? [m/K] " answer </dev/tty
+    case "$answer" in
+      m|M)
+        mv "$entry" "$SKILLS_DIR/$name"
+        ln -s "$SKILLS_DIR/$name" "$entry"
+        echo "adopted  $name -> $SKILLS_DIR/$name (untracked; commit it to keep it)"
+        ;;
+      *)
+        echo "keep     $entry"
+        ;;
+    esac
+  done
+}
+
 # 2b) skills/gitbutler and gitbutler-steering.md are generated from the
 # installed `but` CLI (gitignored), so they always match the binary agents run.
 # Agent session hooks call the same script between setup runs.
@@ -162,6 +201,11 @@ if command -v but >/dev/null 2>&1; then
 else
   echo "skip     gitbutler skill (but CLI not on PATH)"
 fi
+
+# Adopt before linking, so an adopted skill fans out to every agent in this run.
+adopt_real_skills "$CLAUDE_SKILLS_DIR"
+adopt_real_skills "$OPENCODE_SKILLS_DIR"
+adopt_real_skills "$CODEX_SKILLS_DIR"
 
 link_skills_into "$CLAUDE_SKILLS_DIR" "claude"
 link_skills_into "$OPENCODE_SKILLS_DIR" "opencode"
