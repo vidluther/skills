@@ -111,7 +111,7 @@ link_skills_into() {
       echo "replaced $link (was -> $current)"
       replaced=$((replaced + 1))
     elif [ -e "$link" ]; then
-      echo "skip     $link (real directory exists; not overwriting)"
+      echo "skip     $link (real directory kept; see adopt step above)"
       skipped=$((skipped + 1))
     else
       ln -s "$src" "$link"
@@ -154,16 +154,66 @@ report_dangling() {
   fi
 }
 
+# 2a) Skills installed straight into an agent's directory by some other tool
+# (e.g. `rex skill setup`) are real directories, invisible to this repo. Ask
+# whether to adopt each one — move it into skills/ so it's tracked and linked
+# everywhere — or keep it where it is. Only directories with a SKILL.md count.
+# Non-interactive runs keep everything and just report.
+adopt_real_skills() {
+  local target_dir="$1"
+  local entry name answer
+  for entry in "$target_dir"/*/; do
+    entry="${entry%/}"
+    [ -L "$entry" ] && continue
+    [ -f "$entry/SKILL.md" ] || continue
+    name="$(basename "$entry")"
+
+    if [ -e "$SKILLS_DIR/$name" ]; then
+      echo "skip     $entry (real directory; skills/$name already exists in this repo — resolve by hand)"
+      continue
+    fi
+    if [ ! -t 0 ]; then
+      echo "keep     $entry (real directory; re-run interactively to adopt it)"
+      continue
+    fi
+
+    echo
+    echo "found    $entry (real directory, not from this repo)"
+    read -r -p "         [m]ove into skills/ and track it, or [k]eep it here? [m/K] " answer </dev/tty
+    case "$answer" in
+      m|M)
+        mv "$entry" "$SKILLS_DIR/$name"
+        ln -s "$SKILLS_DIR/$name" "$entry"
+        echo "adopted  $name -> $SKILLS_DIR/$name (untracked; commit it to keep it)"
+        ;;
+      *)
+        echo "keep     $entry"
+        ;;
+    esac
+  done
+}
+
+# 2b) skills/gitbutler and gitbutler-steering.md are generated from the
+# installed `but` CLI (gitignored), so they always match the binary agents run.
+# Agent session hooks call the same script between setup runs.
+if command -v but >/dev/null 2>&1; then
+  "$REPO_DIR/scripts/refresh-gitbutler-skill.sh"
+else
+  echo "skip     gitbutler skill (but CLI not on PATH)"
+fi
+
+# Adopt before linking, so an adopted skill fans out to every agent in this run.
+adopt_real_skills "$CLAUDE_SKILLS_DIR"
+adopt_real_skills "$OPENCODE_SKILLS_DIR"
+adopt_real_skills "$CODEX_SKILLS_DIR"
+
 link_skills_into "$CLAUDE_SKILLS_DIR" "claude"
 link_skills_into "$OPENCODE_SKILLS_DIR" "opencode"
 link_skills_into "$CODEX_SKILLS_DIR" "codex"
 
-# 4) GitButler agent setup mirror — reproduces what `but agent setup` (run once,
-# with our chosen options) writes, so other machines only need `git pull && ./setup.sh`:
-# - the gitbutler skill is already linked for every agent by link_skills_into above
-# - the steering block (gitbutler-steering.md) placed in each agent's instruction file
-# To change the options, re-run `but agent setup`, then copy the regenerated
-# ~/.claude/rules/gitbutler.md over gitbutler-steering.md.
+# 4) GitButler steering: gitbutler-steering.md is generated (gitignored) by
+# scripts/refresh-gitbutler-skill.sh in step 2b, which also syncs it into the
+# Codex and OpenCode instruction files. Claude Code reads it as a rule.
 STEERING_SRC="$REPO_DIR/gitbutler-steering.md"
 
 link_one() {
@@ -185,51 +235,10 @@ link_one() {
   fi
 }
 
-# Replace the marker-delimited steering block in an instruction file, appending
-# it (or creating the file) when absent. No-op when already up to date.
-inject_steering() {
-  local file="$1"
-  if [ -L "$file" ]; then
-    echo "skip     $file (symlink; likely dotfile-managed — update it yourself)"
-    return
-  fi
-  mkdir -p "$(dirname "$file")"
-  if [ ! -e "$file" ]; then
-    cp "$STEERING_SRC" "$file"
-    echo "created  $file (steering block)"
-    return
-  fi
-  if grep -q 'gitbutler-agent-setup:start' "$file"; then
-    local tmp
-    tmp="$(mktemp)"
-    awk -v src="$STEERING_SRC" '
-      /<!-- gitbutler-agent-setup:start -->/ {
-        while ((getline line < src) > 0) print line
-        close(src)
-        skipping = 1
-        next
-      }
-      /<!-- gitbutler-agent-setup:end -->/ { if (skipping) { skipping = 0; next } }
-      !skipping { print }
-    ' "$file" > "$tmp"
-    if cmp -s "$tmp" "$file"; then
-      rm "$tmp"
-    else
-      mv "$tmp" "$file"
-      echo "updated  $file (steering block)"
-    fi
-  else
-    { echo; cat "$STEERING_SRC"; } >> "$file"
-    echo "appended $file (steering block)"
-  fi
-}
-
 if [ -f "$STEERING_SRC" ]; then
   link_one "$STEERING_SRC" "$HOME/.claude/rules/gitbutler.md"
-  inject_steering "$HOME/.codex/AGENTS.md"
-  inject_steering "$HOME/.config/opencode/AGENTS.md"
 else
-  echo "warn: $STEERING_SRC missing; skipping GitButler steering mirror" >&2
+  echo "warn: $STEERING_SRC missing (is but on PATH?); skipping GitButler steering" >&2
 fi
 
 report_dangling "$CLAUDE_SKILLS_DIR"

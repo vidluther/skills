@@ -47,7 +47,7 @@ Four destinations, two patterns:
 3. **`~/.config/opencode/skills/<name>`** — one symlink per skill, same shape. OpenCode enumerates this directory.
 4. **`~/.codex/skills/<name>`** — one symlink per skill, same shape. Codex enumerates this directory.
 
-`setup.sh` also reproduces `but agent setup` (see the gitbutler special case below): it symlinks `gitbutler-steering.md` to `~/.claude/rules/gitbutler.md` and injects the steering block into `~/.codex/AGENTS.md` and `~/.config/opencode/AGENTS.md`.
+`setup.sh` also reproduces `but agent setup` (see the gitbutler special case below): `scripts/refresh-gitbutler-skill.sh` generates `gitbutler-steering.md` and injects it into `~/.codex/AGENTS.md` and `~/.config/opencode/AGENTS.md`; `setup.sh` symlinks it to `~/.claude/rules/gitbutler.md`.
 
 **TWG (Atlassian) skills** (`skills/twg*`) are gitignored, not committed. If the `twg` CLI is on PATH, `setup.sh` runs `twg skills install --yes`: twg keeps the real copies in `~/.config/twg/skills` and symlinks them into `~/.agents/skills` (i.e. this repo's `skills/`) and some per-agent dirs, and the per-skill linking then fans them out to every agent. `setup.sh` only runs twg once `~/.agents/skills` is its symlink (otherwise twg would create a real directory there and cut off the custom skills), leaves any link that already resolves to the right directory, and prunes dangling `twg*` links. Update them with `twg upgrade` + `./setup.sh`, not by hand.
 
@@ -70,7 +70,7 @@ When a vendored skill diverges so far that upstream is no longer a useful source
 
 A vendored skill records its origin in the flat top-level frontmatter fields above. The presence of `source:` is what marks a skill as vendored; `rg '^source:' skills/*/SKILL.md` audits them. Bespoke skills have no `source:`.
 
-**Special case — `gitbutler`:** vendored from the `but agent setup` wizard (GitButler CLI), not a git repo, so it has no `source:` frontmatter — the wizard version-stamps `SKILL.md` itself (`version:`). Its `SKILL.md` is wizard-owned: leave it (including `name: but`) untouched so future wizard runs diff cleanly. To update, re-run `but agent setup`, diff what it writes, then copy the regenerated `~/.claude/rules/gitbutler.md` over `gitbutler-steering.md` — **not** via `update-thirdparty-skills.sh`. The steering block in `gitbutler-steering.md` is mirrored into agent instruction files by `setup.sh`.
+**Special case — `gitbutler`:** not vendored — generated. `scripts/refresh-gitbutler-skill.sh` runs `but skill install --path skills/gitbutler` whenever the `version:` stamp in `SKILL.md` differs from `but --version`, so the skill always matches the installed CLI. Only `skills/gitbutler/agents/` is tracked; the rest is gitignored. Never edit the generated files. The script runs from `setup.sh`, a Claude Code `SessionStart` hook (`~/.claude/settings.json`), and an OpenCode plugin (`~/.config/opencode/plugins/gitbutler-skill-refresh.js`). This doesn't contradict the no-auto-update rule: the content comes from the `but` binary agents already execute, not from a remote feed. The steering text works the same way: `gitbutler-steering.md` (gitignored) = `but agent setup --print` (the defaults, versioned with the CLI) + `gitbutler-steering.extra.md` (tracked; the wizard's opt-in sections, which `--print` omits). To change which opt-ins you use, edit `gitbutler-steering.extra.md` — the next run picks it up.
 
 ### Updating a vendored skill
 

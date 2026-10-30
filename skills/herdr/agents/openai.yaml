@@ -1,0 +1,4 @@
+interface:
+  display_name: "Herdr"
+  short_description: "Drive and customize Herdr and herdr-core"
+  default_prompt: "Use $herdr to change my Herdr window or run an agent with hc."
