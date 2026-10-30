@@ -1,0 +1,4 @@
+interface:
+  display_name: "OSV Scan"
+  short_description: "Scan dependencies for vulns and plan remediation"
+  default_prompt: "Use $osv-scan to scan this repo for vulnerable dependencies and recommend next steps."

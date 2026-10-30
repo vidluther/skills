@@ -1,0 +1,32 @@
+{
+  "skill_name": "osv-scan",
+  "evals": [
+    {
+      "id": 0,
+      "name": "vuln-triage-with-permission",
+      "prompt": "run osv-scanner -r . in {repo} and tell me what we should do next. you have my permission to run the scan.",
+      "expected_output": "Scans, reports counts by severity, proposes grouped safe-bumps ticket + separate major-bump tickets (axios) + Dependabot/CI long-term ticket, then asks which tracker and whether to use to-issues before drafting.",
+      "files": [
+        "fixtures/vuln-node"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "asks-before-scanning",
+      "prompt": "can you check {repo} for vulnerable dependencies?",
+      "expected_output": "Verifies osv-scanner is installed, then asks for permission (mentioning data sent to osv.dev / offline option) and does NOT run the scan.",
+      "files": [
+        "fixtures/vuln-node"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "monorepo-dependabot-gap",
+      "prompt": "we set up dependabot in {repo} months ago but someone said we still have vulnerable deps. scan it (go ahead, permission granted) and tell me what's going on and what to do.",
+      "expected_output": "Finds vulns in apps/web, identifies that dependabot.yml only covers '/', recommends adding apps/web directory, grouped plan, then asks which tracker and whether to use to-issues.",
+      "files": [
+        "fixtures/monorepo"
+      ]
+    }
+  ]
+}
