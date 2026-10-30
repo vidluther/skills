@@ -59,6 +59,9 @@ Backups.backupdb
 MobileBackups.trash
 tmbootpicker.efi
 
+#amazon skills
+skills/amazon*
+skills/*aws*
 # TWG skills — installed by `twg skills install` (see setup.sh), Atlassian-licensed
 skills/twg*
 skills/twg/
