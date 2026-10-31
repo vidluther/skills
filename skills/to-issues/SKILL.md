@@ -15,7 +15,7 @@ The issue tracker and triage label vocabulary should have been provided to you �
 
 Work from whatever is already in the conversation context. If the user passes an issue reference (issue number, URL, or path) as an argument, fetch it from the issue tracker and read its full body and comments.
 
-If the source is an **ISA** (Ideal State Artifact — see `docs/agents/isa.md` for where they live), read it in full: its ISCs are the definition of done for every slice, its constraints bind every slice, and its Decisions log overrides anything older in the conversation. An ISA is sliced per initiative — for a parent ISA with child ISAs, slice each child, not the parent. If the user passes a plan that clearly describes an initiative but there's no ISA, say so and offer `rubber-duck` to write one first; proceed without it only if they decline.
+If the source is an **ISA** (Ideal State Artifact — see `docs/agents/isa.md` for where they live), read it in full: its ISCs are the definition of done for every slice, its constraints bind every slice (they stay on the ISA or epic; never copy them into each issue), and its Decisions log overrides anything older in the conversation. An ISA is sliced per initiative — for a parent ISA with child ISAs, slice each child, not the parent. If the user passes a plan that clearly describes an initiative but there's no ISA, say so and offer `rubber-duck` to write one first; proceed without it only if they decline.
 
 ### 2. Explore the codebase (optional)
 
@@ -28,6 +28,24 @@ Look for opportunities to prefactor the code to make the implementation easier. 
 Before drafting, discover what this project's tracker natively supports: issue types, labels, priority, and sizing (Linear's estimate field, if enabled for the team; Jira story points or custom fields such as t-shirt size — check the issue type's field metadata; GitHub labels and Projects fields).
 
 Metadata goes in native fields, never in body prose. Only data with no native home earns a body header line (e.g. **Repo:** / **Files:** in a multi-repo project). If the tracker has no sizing field, omit sizing entirely — free-form metadata text just takes up space. HITL/AFK is expressed as the work-type label (`hitl` / `afk`, mapped in the triage-labels doc), never in the body.
+
+Links between issues follow the same rule: use the native field when it exists, a one-line header only when it doesn't, and never write a value that says "none".
+
+| Thing | Jira / Linear | GitHub Issues | Local files (`issues/NNNN-slug.md`) |
+| --- | --- | --- | --- |
+| Type (`afk` / `hitl`, bug) | Labels and issue type | Labels | In the status line |
+| Parent | Native parent field | Sub-issues if the repo uses them; otherwise omit | Omit; `issues/README.md` is a flat index |
+| Dependencies | Native "blocks" link | `Blocked by: #14` line, only when blocked | `Blocked by: 0003` in the status line, only when blocked |
+| Sub-tasks | Native sub-tasks; the parent Story links them | Flat issues unless the repo uses sub-issues | Flat files, one per slice |
+| Spec | One-line footer | One-line footer | One-line footer, omitted if there's no ISA |
+
+A local issue file starts like this, and nothing else goes above **What**:
+
+```markdown
+# 0004 Add Needs EOB status to report-workorders
+
+Status: open · Type: afk · Blocked by: 0002
+```
 
 ### 4. Draft vertical slices
 
@@ -44,6 +62,8 @@ Slices may be 'HITL' or 'AFK'. HITL slices require human interaction, such as an
 - From an ISA: each slice cites the ISC IDs it satisfies (fully or partly), and every ISC is covered by at least one slice
 </vertical-slice-rules>
 
+**Stories and sub-tasks.** When the tracker has a hierarchy and the work needs it, a **Story** is one outcome (usually one ISC) and its **sub-tasks** are the slices. The Story says What and Why, links its sub-tasks, and keeps only story-level checks ("sub-tasks X and Y are done, and one end-to-end run passes"). The detailed checks live on each sub-task. Never copy a sub-task's checklist onto its Story. Without a hierarchy (most GitHub repos, local files), every slice is a flat issue.
+
 **Coverage check (ISA source only).** Before quizzing, map ISCs → slices. An ISC no slice covers is a gap — add a slice or flag it. A slice that covers no ISC is either prefactoring/spike work (fine — say so) or scope the ISA doesn't ask for (flag it; the ISA wins, or the user adds a Decisions entry). Don't split an ISC across slices so finely that no single slice can run its eval.
 
 **Prefer a spike when the plan rests on unverified assumptions.** If neither the plan nor the team has verified how an external system actually behaves (an undocumented API, a third-party app's real payloads, a retry policy nobody has observed), don't write implementation slices on top of the guess. The first slice manufactures the missing knowledge — stand up the smallest thing that lets you observe reality (a minimal server capturing real requests, a probe script) and write down what you learn. Downstream slices then build on evidence instead of assumed expertise.
@@ -58,6 +78,7 @@ Present the proposed breakdown as a numbered list. For each slice, show:
 - **Shape**: Task / Bug / Spike (see the templates below)
 - **Type**: HITL / AFK (as a label)
 - **Native fields**: proposed estimate, labels, priority — whatever step 3 found
+- **Parent**: the Story it belongs to, if the tracker has a hierarchy
 - **Blocked by**: which other slices (if any) must complete first
 - **User stories covered**: which user stories this addresses (if the source material has them)
 - **ISCs satisfied**: which ISC IDs this slice satisfies (if the source is an ISA)
@@ -84,62 +105,76 @@ Iterate until the user approves the breakdown.
 - Specificity scales with code maturity. Cite file paths, line numbers, and real snippets only for code that exists and that you verified while drafting — a concrete `dashboard.controller.js:56` saves the assignee rediscovery. For greenfield work, describe end-to-end behavior and contracts instead. Never invent paths.
 - If a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it and note briefly that it came from a prototype. Trim to the decision-rich parts.
 
-For each approved slice, publish a new issue using the matching template below. Set metadata (estimate, priority, HITL/AFK) through the native fields found in step 3. Apply the `new` provenance label so each issue is identifiable as agent-created. They enter the inbox state automatically (no state label means inbox).
+**Write plain English, like a teammate, not a spec.**
 
-Publish issues in dependency order (blockers first) so you can reference real issue identifiers in the "Blocked by" field. Every shape ends with:
+- Name the real thing: the payer, the person, the file, the prompt. Never abstract roles ("the Owner", "the target system", "the orchestration layer").
+- One check per bullet, written as what happens. No noun piles ("verification, holds, selected claims, and closing are correct").
+- Everyday words over spec jargon: "keep every run", not "preserve execution provenance"; "the call as it happened", not "first-pass qualification evidence". When a project term is unavoidable, link the project's glossary once.
+- No unrequested clarifying asides ("code sends the digits; an AI never does"). They're often wrong and read as filler.
+- If something is genuinely undecided, add an **Open question** section with the question, rather than vague wording around it.
+- Project-wide rules (operating limits, data handling, approval rules) live on the epic or ISA. Don't repeat them in each issue.
 
-- **Blocked by** — real issue identifiers, or "None — can start immediately".
-- **Parent** — reference to the parent issue, only if the source was an existing issue.
-- **Satisfies** — only if the source was an ISA: a link to the ISA plus the ISC IDs this issue satisfies, each restated in one plain sentence (the assignee hasn't read the ISA). Each cited ISC's eval also appears as an Acceptance bullet, phrased as the check to run.
+For each approved slice, publish a new issue using the matching template below. Set metadata (type, estimate, priority, HITL/AFK, parent, dependencies) through the native fields found in step 3, or the status line for local files. Apply the `new` provenance label where the tracker has labels, so each issue is identifiable as agent-created. They enter the inbox state automatically (no state label means inbox).
+
+Publish issues in dependency order (blockers first) so links point at real identifiers. Every template ends with one footer line, and only the parts that apply:
+
+`Spec: <ISA link or path> (ISC-4) · Terms: <glossary link>`
+
+Don't restate the ISC in a separate section: its eval already appears in **Done when**, phrased as the check to run.
 
 <task-template>
-**Context**
+## What
 
-What exists today and why this work is needed — self-contained, 2–5 plain sentences. A reader must be able to judge the acceptance criteria from this section alone.
+1–3 plain sentences: what this issue builds or changes, starting with a verb. For a Story, also list its sub-tasks here, one line each.
 
-**Scope**
+## Why
 
-What to do, described as end-to-end behavior. Include an explicit non-goals line: what this issue deliberately does NOT touch, so the work doesn't sprawl.
+1–3 sentences: what's broken, missing, or manual today, and what in the code or process is in the way. Cite `path/file:line` when it exists.
 
-**Acceptance**
+## Done when
 
-- Observable outcome 1
-- Observable outcome 2
+- One checkable outcome per bullet, something a person can tick off
+- …
+
+## Not in this ticket
+
+One line naming nearby work that belongs elsewhere, with its issue IDs. Omit if there's nothing worth naming.
 </task-template>
 
 <bug-template>
-**Problem**
+## What's broken
 
-The defect, with the offending code/paths (the code exists by definition — anchor it).
+The defect in plain English, anchored to the offending `path/file:line` (the code exists by definition).
 
-**Reproduction**
+## How to reproduce
 
 1. Numbered steps from a clean start
 2. …
 3. Observed vs expected result
 
-**Fix**
+## Fix
 
-The known or suspected remedy, and why it's safe for existing consumers.
+The known or suspected remedy, and why it's safe for existing callers.
 
-**Acceptance**
+## Done when
 
-- The fixed behavior
-- Regression check on existing consumers of the touched code
+- The broken case now works
+- Existing callers of the touched code still pass
 </bug-template>
 
 <spike-template>
-**Question to answer**
+## Question
 
 The specific unknown, and why guessing is riskier than finding out.
 
-**How to find out**
+## How to find out
 
-The concrete method — e.g. stand up a minimal webserver and capture real requests, run a probe against the live API, read the vendor's actual responses.
+The concrete method: stand up a minimal server and capture real requests, run a probe against the live API, read the vendor's actual responses.
 
-**Deliverable**
+## Done when
 
-Written findings and/or a decision the downstream issues can cite — knowledge, not shipped features. (Small enabling code, like the capture harness itself, may land.)
+- The findings or decision are written down where downstream issues can cite them
+- Small enabling code (such as the capture harness) may land; shipped features don't
 </spike-template>
 
 Do NOT close or modify any parent issue.

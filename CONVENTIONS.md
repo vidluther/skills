@@ -52,7 +52,7 @@ Origin: Daniel Miessler, [Writing is closer to thought than code](https://daniel
 | `docs/adr/` | Architecture Decision Records — why we chose X. |
 | `docs/isa/` | ISAs, when they live in-repo. |
 | `docs/agents/` | What `marshal` recorded: tracker, labels, domain layout, ISA location. |
-| `.out-of-scope/` | Rejected requests, with reasons. |
+| `.out-of-scope/` | Rejected requests, with reasons (local-file trackers only; remote trackers close them as won't-fix). |
 
 ### This harness
 
@@ -97,7 +97,7 @@ Origin: Daniel Miessler, [Writing is closer to thought than code](https://daniel
 
 ### Pick up an issue
 
-1. Read the ISA it belongs to (via its **Satisfies** line / epic / parent link).
+1. Read the ISA it belongs to (via its **Spec** footer / epic / parent link).
 2. Implement. If it contradicts a constraint or decision → stop and say so.
 3. Changed your mind about the goal? Add a dated Decisions entry first.
 

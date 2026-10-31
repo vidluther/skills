@@ -26,7 +26,8 @@ Each section follows the same shape:
 
 Read whatever exists. Don't assume.
 
-- `git remote -v` and `.git/config` — is this a GitHub repo? Which one?
+- `git remote -v` and `.git/config` — is this a GitHub repo? Which one? No remote at all suggests local issue files.
+- `issues/` at the repo root — local issue files already in use?
 - `CLAUDE.md` and `AGENTS.md` at the repo root — does either exist? If both, are they identical (a symlink), or have they drifted apart? Is there already an `## Agent skills` section?
 - `CONTEXT.md` and `CONTEXT-MAP.md` at the repo root.
 - `docs/adr/` and any `src/*/docs/adr/` directories.
@@ -65,9 +66,10 @@ The `## Agent skills` block goes in the canonical file.
 
 > **Explainer:** The "issue tracker" is where issues live for this repo. Skills like `to-issues` read from and write to it — they need to know whether to call `gh issue create` or follow some other workflow you describe. Pick the place you actually track work for this repo.
 
-Propose the tracker the evidence points to — a GitHub remote suggests GitHub Issues, but ask, since many teams track work elsewhere. `to-issues` probes each tracker's native fields, so any tracker works. Offer:
+Propose the tracker the evidence points to — a GitHub remote suggests GitHub Issues, no remote suggests local files, but ask, since many teams track work elsewhere. `to-issues` probes each tracker's native fields, so any tracker works. Offer:
 
 - **GitHub** — issues live in the repo's GitHub Issues (uses the `gh` CLI).
+- **Local files** — for a young project with no remote tracker yet: one markdown file per issue in `issues/`, indexed in `issues/README.md`. Ask whether `issues/` should be committed or gitignored. Easy to migrate to a remote tracker later.
 - **Other** (Jira, Linear, GitLab, etc.) — ask the user to describe the workflow in one paragraph (project/team key, and which CLI or MCP tools reach it); record it as freeform prose in `docs/agents/issue-tracker.md`.
 
 #### Triage label vocabulary
@@ -103,13 +105,13 @@ For GitHub trackers, run `gh label list --json name,description,color` to enumer
 2. **Create missing canonical labels.** If any canonical labels the user wants don't physically exist in the tracker, offer to create them via `gh label create <name> --description "<meaning>" --color <hex>`. Otherwise `gh issue edit --add-label` will fail at runtime when a skill tries to apply them. Sensible defaults: `afk` teal, `hitl` yellow, `needs-info` orange, `ready-for-agent` green, `ready-for-human` blue, `wontfix` grey, `new` light blue, `bug` red, `enhancement` purple.
 3. **Record non-canonical labels.** Everything else (`security`, `p0`, `area:auth`, `regression`, etc.) gets recorded in `docs/agents/triage-labels.md` under "Other labels in this repo". Skills surface these in agent briefs so implementing agents see the full context (an issue with `ready-for-agent + security` should be handled very differently from a routine `ready-for-agent + bug`).
 
-For non-GitHub trackers, ask the user to describe the equivalent vocabulary as freeform prose.
+For local files, labels are words in each issue's status line (`Type: afk`); record the vocabulary in `docs/agents/triage-labels.md`, nothing to create. For other trackers, ask the user to describe the equivalent vocabulary as freeform prose.
 
 ---
 
 ### Section 3 — What things mean
 
-> **Explainer:** Some skills (`improve-codebase-architecture`, `diagnose`) read a `CONTEXT.md` file to learn the project's domain language, and `docs/adr/` for past architectural decisions. They need to know whether the repo has one global context or multiple (e.g. a monorepo with separate frontend/backend contexts) so they look in the right place. Marshal also pre-creates the `.out-of-scope/` directory used to record rejected feature requests with reasoning.
+> **Explainer:** Some skills (`improve-codebase-architecture`, `diagnose`) read a `CONTEXT.md` file to learn the project's domain language, and `docs/adr/` for past architectural decisions. They need to know whether the repo has one global context or multiple (e.g. a monorepo with separate frontend/backend contexts) so they look in the right place. Rejected feature requests are recorded with their reasoning: closed as won't-fix in a remote tracker, or in a `.out-of-scope/` directory when issues are local files.
 
 Confirm the layout:
 
@@ -118,7 +120,7 @@ Confirm the layout:
 
 Marshal does not fill in `CONTEXT.md` content — that's `rubber-duck`'s job, and it happens lazily as terms get resolved during real work. Marshal only records where these files live so the consumer skills know where to look.
 
-Offer to create empty `docs/adr/` and `.out-of-scope/` directories if they don't exist (with a `.gitkeep` so they survive git).
+Offer to create an empty `docs/adr/` directory if it doesn't exist (with a `.gitkeep` so it survives git), plus `.out-of-scope/` only when the tracker is local files.
 
 ---
 
@@ -256,6 +258,7 @@ The `## Agent skills` block:
 Then write the four docs files using the seed templates in this skill folder as a starting point:
 
 - [issue-tracker-github.md](./issue-tracker-github.md) — GitHub issue tracker
+- [issue-tracker-local.md](./issue-tracker-local.md) — local issue files
 - [triage-labels.md](./triage-labels.md) — label mapping (state + provenance + non-canonical)
 - [domain.md](./domain.md) — domain doc consumer rules + layout
 - [isa.md](./isa.md) — ISA model, shape, and location
