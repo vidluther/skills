@@ -1,0 +1,4 @@
+interface:
+  display_name: "RemCTL"
+  short_description: "Read or change Apple Reminders via RemCTL"
+  default_prompt: "Use $remctl to show what's due today in my reminders."
