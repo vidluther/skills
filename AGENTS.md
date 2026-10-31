@@ -4,7 +4,7 @@ This file provides guidance to AI coding agents working in this repository.
 
 ## What this repo is
 
-`skills` is a personal harness — a collection of **skills** (capability-shaped prompts) that local AI agents can use. It is not an application. There is no build step, no test suite, no linter, no package manager — do not invent commands that don't exist here.
+`skills` is a personal harness — a collection of **skills** (capability-shaped prompts) that local AI agents can use. It is not an application. There is no build step and no package manager. The only checks are the ones under "Checks" below; don't invent other commands.
 
 Currently, installation is manual: clone the repo, then run the setup script to link the skills into the expected locations. In the future, this may be automated or integrated with npm or a package manager.
 
@@ -58,7 +58,18 @@ Four destinations, two patterns:
 1. Create `skills/<name>/SKILL.md` with the frontmatter above.
 2. Create `skills/<name>/agents/openai.yaml` with `display_name`, `short_description`, and a `default_prompt` that mentions `$<name>`.
 3. Add any supporting files in the same directory.
-4. Run `./setup.sh` — it will print `linked   ~/.claude/skills/<name>`.
+4. Run the checks below. Both see new files before you commit them.
+5. Run `./setup.sh` — it will print `linked   ~/.claude/skills/<name>`.
+
+## Checks
+
+CI (`.github/workflows/checks.yml`) runs these on every push to `main` and every PR. Run the same ones locally first, so nothing gets flagged after it's pushed:
+
+- **`scripts/scan-skills.sh`**: SkillSpector static scan of every skill git tracks or would commit. **Required before committing any change under `skills/`.** It fails when a skill's risk score is above 50 ("DO NOT INSTALL"). Lower-scoring findings don't fail it, but don't add new ones without a reason. Run with `-v` to list them all.
+- **`uv run --script .github/scripts/check_skill_structure.py`**: frontmatter, `name` matching the directory, `agents/openai.yaml`, vendored provenance fields, and relative markdown links that point at real files in the repo.
+- **ShellCheck** on tracked `*.sh` files: CI only, unless `shellcheck` is installed locally.
+
+The SkillSpector version is pinned once, in `scripts/scan-skills.sh`; CI follows it. To bump it, change the pin there, then update the local install with `uv tool install --force git+https://github.com/NVIDIA/SkillSpector.git@v<version>`. The script warns when the local version doesn't match the pin.
 
 ## Third-party (vendored) skills
 
