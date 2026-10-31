@@ -67,9 +67,6 @@ skills/twg*
 skills/twg/
 skills/twg-*/
 
-# Rex skill — installed by `rex skill setup` via the ~/.agents/skills symlink
-skills/rex/
-
 # GitButler skill — generated from the installed `but` CLI by
 # scripts/refresh-gitbutler-skill.sh (setup.sh + agent session hooks).
 skills/gitbutler/*

@@ -155,7 +155,7 @@ report_dangling() {
 }
 
 # 2a) Skills installed straight into an agent's directory by some other tool
-# (e.g. `rex skill setup`) are real directories, invisible to this repo. Ask
+# (e.g. a vendor CLI's own skill installer) are real directories, invisible to this repo. Ask
 # whether to adopt each one — move it into skills/ so it's tracked and linked
 # everywhere — or keep it where it is. Only directories with a SKILL.md count.
 # Non-interactive runs keep everything and just report.
