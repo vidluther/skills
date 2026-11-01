@@ -25,7 +25,7 @@ END_MARKER='<!-- gitbutler-agent-setup:end -->'
 command -v but >/dev/null 2>&1 || exit 0
 
 cli="$(but --version | awk '{print $2}')"
-have="$(sed -n 's/^version: //p' "$SKILL_DIR/SKILL.md" 2>/dev/null | head -n 1)"
+have="$(sed -n 's/^version: //p' "$SKILL_DIR/SKILL.md" 2>/dev/null | head -n 1 || true)"
 force=false
 [ "${1:-}" = "--force" ] && force=true
 
